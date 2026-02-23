@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 10%;
 
     /* Galla signature red */
-    --primary: 0 82% 49%;
+    --primary: 0 100% 34%;
     --primary-foreground: 0 0% 100%;
     
     --primary-dark: 0 70% 42%;
@@ -37,7 +37,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 0 82% 49%;
+    --ring: 0 100% 34%;
 
     --radius: 0.5rem;
 
@@ -65,7 +65,7 @@ All colors MUST be HSL.
     --popover: 0 0% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 82% 49%;
+    --primary: 0 100% 34%;
     --primary-foreground: 0 0% 100%;
     
     --primary-dark: 0 70% 42%;
@@ -84,7 +84,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 0 82% 49%;
+    --ring: 0 100% 34%;
     
     --shadow-product: 0 10px 40px -10px hsl(0 0% 0% / 0.4);
     --shadow-product-hover: 0 20px 60px -10px hsl(0 0% 0% / 0.6);
