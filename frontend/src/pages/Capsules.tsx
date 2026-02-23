@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
 import capsuleClassic from "@/assets/yellow.jpeg";
@@ -8,6 +8,7 @@ import classicCoffee from "@/assets/classic-coffee.png";
 import aromaCoffee from "@/assets/aroma-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
+import { placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 
 const capsuleProducts = [
   {
@@ -93,21 +94,23 @@ const Capsules = () => {
   const shippingFee = totalCapsulePacks === 0 ? 0 : capsuleTotal >= 35 ? 0 : 3.9;
   const finalTotal = capsuleTotal + shippingFee;
   const hasCapsuleSelection = totalCapsulePacks > 0;
-
-  const orderBody =
-    selectedCapsules.length === 0
-      ? "Hello Galla Team,%0D%0A%0D%0AI want to place an order for capsules."
-      : encodeURIComponent(
-          `Hello Galla Team,\n\nI want to order the following capsules:\n${selectedCapsules
-            .map(
-              (product) =>
-                `- ${product.name}: ${capsuleQty[product.id]} pack(s) x EUR ${product.price.toFixed(2)} = EUR ${(
-                  capsuleQty[product.id] * product.price
-                ).toFixed(2)}`,
-            )
-            .join("\n")}\n\nTotal: EUR ${capsuleTotal.toFixed(2)}\n\nPlease contact me to confirm delivery details.`,
-        );
-  const orderEmailLink = `mailto:orders@galla.mk?subject=${encodeURIComponent("Galla Capsules Order")}&body=${orderBody}`;
+  const [orderForm, setOrderForm] = useState({
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    note: "",
+  });
+  const [orderSubmitState, setOrderSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [orderSubmitMessage, setOrderSubmitMessage] = useState("");
+  const [espressoForm, setEspressoForm] = useState({
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    message: "",
+    products: [] as string[],
+  });
+  const [espressoSubmitState, setEspressoSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [espressoSubmitMessage, setEspressoSubmitMessage] = useState("");
 
   const increaseCapsule = (id: string) => {
     setCapsuleQty((prev) => ({ ...prev, [id]: prev[id] + 1 }));
@@ -115,6 +118,63 @@ const Capsules = () => {
 
   const decreaseCapsule = (id: string) => {
     setCapsuleQty((prev) => ({ ...prev, [id]: Math.max(0, prev[id] - 1) }));
+  };
+
+  const handleCapsuleOrderSubmit = async () => {
+    if (!hasCapsuleSelection) return;
+
+    setOrderSubmitState("loading");
+    setOrderSubmitMessage("");
+    try {
+      await placeCapsuleOrder({
+        customerName: orderForm.customerName,
+        customerEmail: orderForm.customerEmail,
+        customerPhone: orderForm.customerPhone || undefined,
+        note: orderForm.note || undefined,
+        items: selectedCapsules.map((product) => ({
+          productId: `capsules-${product.id}`,
+          quantity: capsuleQty[product.id],
+        })),
+      });
+
+      setOrderSubmitState("success");
+      setOrderSubmitMessage("Order request sent successfully.");
+      setCapsuleQty({ classic: 0, aroma: 0, black: 0 });
+      setOrderForm({ customerName: "", customerEmail: "", customerPhone: "", note: "" });
+    } catch (error) {
+      setOrderSubmitState("error");
+      setOrderSubmitMessage(error instanceof Error ? error.message : "Failed to send order.");
+    }
+  };
+
+  const handleSelectEspressoProduct = (productId: string) => {
+    setEspressoForm((prev) => ({
+      ...prev,
+      products: prev.products.includes(productId) ? prev.products : [...prev.products, productId],
+    }));
+    document.getElementById("espresso-inquiry-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const handleEspressoInquirySubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setEspressoSubmitState("loading");
+    setEspressoSubmitMessage("");
+
+    try {
+      await sendEspressoInquiry({
+        customerName: espressoForm.customerName,
+        customerEmail: espressoForm.customerEmail,
+        customerPhone: espressoForm.customerPhone || undefined,
+        message: espressoForm.message || undefined,
+        products: espressoForm.products,
+      });
+      setEspressoSubmitState("success");
+      setEspressoSubmitMessage("Inquiry sent successfully.");
+      setEspressoForm({ customerName: "", customerEmail: "", customerPhone: "", message: "", products: [] });
+    } catch (error) {
+      setEspressoSubmitState("error");
+      setEspressoSubmitMessage(error instanceof Error ? error.message : "Failed to send inquiry.");
+    }
   };
 
   return (
@@ -199,6 +259,37 @@ const Capsules = () => {
               Packs selected: <span className="font-semibold text-[#1f1f1f]">{totalCapsulePacks}</span>
             </p>
 
+            <div className="mt-4 space-y-3">
+              <input
+                type="text"
+                value={orderForm.customerName}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, customerName: event.target.value }))}
+                placeholder="Your name"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <input
+                type="email"
+                value={orderForm.customerEmail}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, customerEmail: event.target.value }))}
+                placeholder="Your email"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <input
+                type="text"
+                value={orderForm.customerPhone}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                placeholder="Phone (optional)"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <textarea
+                value={orderForm.note}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, note: event.target.value }))}
+                placeholder="Order note (optional)"
+                rows={3}
+                className="w-full resize-y rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+            </div>
+
             <div className="mt-4 space-y-2 border-b border-[#e8ddd2] pb-4 text-sm text-[#383838]">
               {selectedCapsules.length === 0 ? (
                 <p>No products selected yet.</p>
@@ -227,17 +318,24 @@ const Capsules = () => {
               </div>
             </div>
 
-            <a
-              href={orderEmailLink}
+            <button
+              type="button"
+              onClick={handleCapsuleOrderSubmit}
+              disabled={
+                orderSubmitState === "loading" || !orderForm.customerName || !orderForm.customerEmail || !hasCapsuleSelection
+              }
               className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-[#9e0102] px-5 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
             >
-              Proceed To Order
-            </a>
+              {orderSubmitState === "loading" ? "Submitting..." : "Proceed To Order"}
+            </button>
+            {orderSubmitState !== "idle" && (
+              <p className={`mt-2 text-xs ${orderSubmitState === "success" ? "text-green-700" : "text-red-700"}`}>
+                {orderSubmitMessage}
+              </p>
+            )}
 
             <p className="mt-3 text-xs text-[#6d6259]">Free shipping above EUR 35. Orders are prepared within 24 hours.</p>
-            <p className="mt-2 text-xs text-[#6d6259]">
-              Checkout currently opens email to <span className="font-semibold">orders@galla.mk</span>.
-            </p>
+            <p className="mt-2 text-xs text-[#6d6259]">Orders are submitted directly to the backend API.</p>
           </aside>
           )}
         </div>
@@ -260,16 +358,90 @@ const Capsules = () => {
                 <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#9e0102]">Available For Order</p>
-                  <a
-                    href="mailto:orders@galla.mk?subject=Espresso%20Order%20Inquiry"
+                  <button
+                    type="button"
+                    onClick={() => handleSelectEspressoProduct(product.id)}
                     className="inline-flex items-center rounded-md bg-[#9e0102] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] text-white transition-opacity hover:opacity-90"
                   >
                     Request Offer
-                  </a>
+                  </button>
                 </div>
               </article>
             ))}
           </div>
+
+          <form
+            id="espresso-inquiry-form"
+            onSubmit={handleEspressoInquirySubmit}
+            className="mt-8 rounded-2xl border border-[#dbcfc4] bg-white p-6 shadow-md"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[#9e0102]">Espresso Inquiry Form</p>
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              {espressoProducts.map((product) => (
+                <label key={product.id} className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={espressoForm.products.includes(product.id)}
+                    onChange={(event) =>
+                      setEspressoForm((prev) => ({
+                        ...prev,
+                        products: event.target.checked
+                          ? [...prev.products, product.id]
+                          : prev.products.filter((id) => id !== product.id),
+                      }))
+                    }
+                  />
+                  {product.name}
+                </label>
+              ))}
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <input
+                type="text"
+                required
+                value={espressoForm.customerName}
+                onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerName: event.target.value }))}
+                placeholder="Your name"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <input
+                type="email"
+                required
+                value={espressoForm.customerEmail}
+                onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerEmail: event.target.value }))}
+                placeholder="Your email"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <input
+                type="text"
+                value={espressoForm.customerPhone}
+                onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                placeholder="Phone (optional)"
+                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <textarea
+                value={espressoForm.message}
+                onChange={(event) => setEspressoForm((prev) => ({ ...prev, message: event.target.value }))}
+                placeholder="Message (optional)"
+                rows={3}
+                className="w-full resize-y rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102] md:col-span-2"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={espressoSubmitState === "loading" || espressoForm.products.length === 0}
+              className="mt-4 inline-flex items-center rounded-md bg-[#9e0102] px-5 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {espressoSubmitState === "loading" ? "Submitting..." : "Send Inquiry"}
+            </button>
+            {espressoSubmitState !== "idle" && (
+              <p className={`mt-2 text-sm ${espressoSubmitState === "success" ? "text-green-700" : "text-red-700"}`}>
+                {espressoSubmitMessage}
+              </p>
+            )}
+          </form>
         </div>
       </div>
       </div>

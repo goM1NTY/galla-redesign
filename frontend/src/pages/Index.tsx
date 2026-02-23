@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { sendContact } from "@/lib/api";
 import classicCoffee from "@/assets/classic-coffee.png";
 import aromaCoffee from "@/assets/aroma-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
@@ -174,6 +175,14 @@ const Index = () => {
   const t = translations[lang];
   const [productsCarouselApi, setProductsCarouselApi] = useState<CarouselApi>();
   const [showCapsulesPopup, setShowCapsulesPopup] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [contactSubmitState, setContactSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [contactSubmitMessage, setContactSubmitMessage] = useState("");
 
   useEffect(() => {
     if (!productsCarouselApi) return;
@@ -223,6 +232,27 @@ const Index = () => {
       image: blackCoffee,
     },
   ];
+
+  const handleContactSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setContactSubmitState("loading");
+    setContactSubmitMessage("");
+
+    try {
+      await sendContact({
+        name: contactForm.name,
+        email: contactForm.email,
+        subject: contactForm.subject || undefined,
+        message: contactForm.message,
+      });
+      setContactSubmitState("success");
+      setContactSubmitMessage("Message sent successfully. We will contact you shortly.");
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      setContactSubmitState("error");
+      setContactSubmitMessage(error instanceof Error ? error.message : "Failed to send message.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -469,7 +499,7 @@ const Index = () => {
                 <p>+385 98 191 2003</p>
               </div>
 
-              <p className="mt-5 font-semibold text-[#9e0102]">info@galla.mk</p>
+              <p className="mt-5 font-semibold text-[#9e0102]">minetamexhiti01@gmail.com</p>
             </div>
 
             <div className="mt-4 rounded-xl border border-[#d9cdc1] bg-white p-6">
@@ -485,7 +515,7 @@ const Index = () => {
           </div>
 
           <div className="rounded-2xl border border-[#d9cdc1] bg-white p-6 md:p-8">
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleContactSubmit}>
               <div>
                 <label htmlFor="contact-name" className="mb-2 block text-sm font-semibold text-[#2a2a2a]">
                   {t.nameRequired}
@@ -495,7 +525,9 @@ const Index = () => {
                   name="name"
                   type="text"
                   required
-                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm outline-none transition-colors focus:border-[#9e0102]"
+                  value={contactForm.name}
+                  onChange={(event) => setContactForm((prev) => ({ ...prev, name: event.target.value }))}
+                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm text-[#1f1f1f] outline-none transition-colors focus:border-[#9e0102]"
                 />
               </div>
 
@@ -508,7 +540,9 @@ const Index = () => {
                   name="email"
                   type="email"
                   required
-                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm outline-none transition-colors focus:border-[#9e0102]"
+                  value={contactForm.email}
+                  onChange={(event) => setContactForm((prev) => ({ ...prev, email: event.target.value }))}
+                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm text-[#1f1f1f] outline-none transition-colors focus:border-[#9e0102]"
                 />
               </div>
 
@@ -520,7 +554,9 @@ const Index = () => {
                   id="contact-subject"
                   name="subject"
                   type="text"
-                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm outline-none transition-colors focus:border-[#9e0102]"
+                  value={contactForm.subject}
+                  onChange={(event) => setContactForm((prev) => ({ ...prev, subject: event.target.value }))}
+                  className="w-full rounded-md border border-[#d6c8bb] px-4 py-3 text-sm text-[#1f1f1f] outline-none transition-colors focus:border-[#9e0102]"
                 />
               </div>
 
@@ -532,16 +568,25 @@ const Index = () => {
                   id="contact-message"
                   name="message"
                   rows={6}
-                  className="w-full resize-y rounded-md border border-[#d6c8bb] px-4 py-3 text-sm outline-none transition-colors focus:border-[#9e0102]"
+                  required
+                  value={contactForm.message}
+                  onChange={(event) => setContactForm((prev) => ({ ...prev, message: event.target.value }))}
+                  className="w-full resize-y rounded-md border border-[#d6c8bb] px-4 py-3 text-sm text-[#1f1f1f] outline-none transition-colors focus:border-[#9e0102]"
                 />
               </div>
 
               <button
                 type="submit"
+                disabled={contactSubmitState === "loading"}
                 className="inline-flex items-center rounded-md bg-[#9e0102] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
               >
-                {t.send}
+                {contactSubmitState === "loading" ? "Sending..." : t.send}
               </button>
+              {contactSubmitState !== "idle" && (
+                <p className={`text-sm ${contactSubmitState === "success" ? "text-green-700" : "text-red-700"}`}>
+                  {contactSubmitMessage}
+                </p>
+              )}
             </form>
           </div>
         </div>
@@ -573,7 +618,7 @@ const Index = () => {
               <p>Ilindenska 160, Tetovo, Macedonia</p>
               <p>+389 44 333 375</p>
               <p>+389 71 224 557</p>
-              <p>info@galla.mk</p>
+              <p>minetamexhiti01@gmail.com</p>
             </div>
           </div>
         </div>
