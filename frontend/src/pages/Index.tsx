@@ -8,9 +8,9 @@ import aromaCoffee from "@/assets/aroma-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import espressoPhoto from "@/assets/5.jpeg";
-import capsulesPhoto from "@/assets/capsules.jpeg";
+import capsulesPhoto from "@/assets/capsules.png";
 import capsulesClassic from "@/assets/capsules_classic.png";
-import capsulesAromaCustom from "@/assets/capsules_aroma_custom.png";
+import capsulesAromaCustom from "@/assets/red.webp";
 
 type Language = "en" | "sq" | "mk";
 
@@ -289,7 +289,7 @@ const Index = () => {
       <Header lang={lang} onLangChange={setLang} />
       {showCapsulesPopup && (
         <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/45 px-4 backdrop-blur-[8px]">
-          <div className="relative w-full max-w-5xl rounded-2xl border border-[#e2d4c7] bg-white p-5 shadow-2xl md:p-7">
+          <div className="relative w-full max-w-4xl rounded-2xl border border-[#e2d4c7] bg-white p-5 shadow-2xl md:p-6">
             <button
               type="button"
               onClick={() => setShowCapsulesPopup(false)}
@@ -301,11 +301,11 @@ const Index = () => {
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:gap-8">
               <div className="md:col-span-2">
-                <div className="flex h-full min-h-[290px] items-center justify-center rounded-xl bg-[#f4f4f4] p-5">
+                <div className="flex h-full min-h-[260px] items-center justify-center rounded-xl bg-[#f4f4f4] p-4">
                   <img
                     src={capsulesPhoto}
                     alt="Galla Black and capsules"
-                    className="h-72 w-auto rounded-lg object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.25)] md:h-[22rem]"
+                    className="h-full max-h-[20rem] w-full rounded-lg object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.25)]"
                   />
                 </div>
               </div>
