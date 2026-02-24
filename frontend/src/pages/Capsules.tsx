@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
-import capsuleClassic from "@/assets/yellow.jpeg";
+import capsuleClassic10 from "@/assets/capsules_classic.png";
+import capsuleClassic50 from "@/assets/50x.jpeg";
 import capsuleAroma from "@/assets/red.webp";
 import capsuleBlack from "@/assets/black.jpeg";
 import classicCoffee from "@/assets/classic-coffee.png";
@@ -12,19 +13,35 @@ import { placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 
 const capsuleProducts = [
   {
-    id: "classic",
-    name: "Capsules Classic",
-    image: capsuleClassic,
+    id: "capsules-classic",
+    name: "Capsules Classic 10x",
+    image: capsuleClassic10,
     description:
       "The quintessential Galla experience. A harmonious blend with a velvety crema and a smooth, lingering finish.",
     price: 6.4,
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium",
     intensity: "7/10",
+    format: "Box of 10 capsules",
     compatibility: "Nespresso Original compatible",
+    imageClassName: "mix-blend-multiply",
   },
   {
-    id: "aroma",
+    id: "capsules-classic-50x",
+    name: "Capsules Classic 50x",
+    image: capsuleClassic50,
+    description:
+      "The same signature Classic profile in a larger box for high-volume use and longer stock at home or office.",
+    price: 28.9,
+    netWeight: "50 capsules x 5 g (250 g)",
+    roast: "Medium",
+    intensity: "7/10",
+    format: "Box of 50 capsules",
+    compatibility: "Nespresso Original compatible",
+    imageClassName: "mix-blend-multiply translate-y-5",
+  },
+  {
+    id: "capsules-aroma",
     name: "Capsules Aroma",
     image: capsuleAroma,
     description:
@@ -33,10 +50,12 @@ const capsuleProducts = [
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium-Dark",
     intensity: "8/10",
+    format: "Box of 10 capsules",
     compatibility: "Nespresso Original compatible",
+    imageClassName: "mix-blend-multiply",
   },
   {
-    id: "black",
+    id: "capsules-black",
     name: "Capsules Black",
     image: capsuleBlack,
     description: "Strong body and deeper roast character with long finish and bold espresso expression.",
@@ -44,7 +63,9 @@ const capsuleProducts = [
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Dark",
     intensity: "10/10",
+    format: "Box of 10 capsules",
     compatibility: "Nespresso Original compatible",
+    imageClassName: "mix-blend-multiply",
   },
 ];
 
@@ -80,27 +101,28 @@ const espressoProducts = [
 ];
 
 const CART_STORAGE_KEY = "galla_capsules_cart";
+const INITIAL_CAPSULE_QTY = Object.fromEntries(capsuleProducts.map((product) => [product.id, 0])) as Record<string, number>;
 
 const Capsules = () => {
+  const [capsuleClassic50Transparent, setCapsuleClassic50Transparent] = useState(capsuleClassic50);
+
   const [capsuleQty, setCapsuleQty] = useState<Record<string, number>>(() => {
     if (typeof window === "undefined") {
-      return { classic: 0, aroma: 0, black: 0 };
+      return { ...INITIAL_CAPSULE_QTY };
     }
 
     const saved = window.localStorage.getItem(CART_STORAGE_KEY);
     if (!saved) {
-      return { classic: 0, aroma: 0, black: 0 };
+      return { ...INITIAL_CAPSULE_QTY };
     }
 
     try {
       const parsed = JSON.parse(saved) as Record<string, number>;
-      return {
-        classic: Math.max(0, Number(parsed.classic) || 0),
-        aroma: Math.max(0, Number(parsed.aroma) || 0),
-        black: Math.max(0, Number(parsed.black) || 0),
-      };
+      return Object.fromEntries(
+        capsuleProducts.map((product) => [product.id, Math.max(0, Number(parsed[product.id]) || 0)]),
+      ) as Record<string, number>;
     } catch {
-      return { classic: 0, aroma: 0, black: 0 };
+      return { ...INITIAL_CAPSULE_QTY };
     }
   });
 
@@ -136,6 +158,96 @@ const Capsules = () => {
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(capsuleQty));
   }, [capsuleQty]);
 
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = capsuleClassic50;
+
+    img.onload = () => {
+      const width = img.width;
+      const height = img.height;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.drawImage(img, 0, 0, width, height);
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const { data } = imageData;
+
+      const corners = [
+        0,
+        (width - 1) * 4,
+        ((height - 1) * width) * 4,
+        ((height - 1) * width + (width - 1)) * 4,
+      ];
+
+      const bg = corners.reduce(
+        (acc, idx) => {
+          acc.r += data[idx];
+          acc.g += data[idx + 1];
+          acc.b += data[idx + 2];
+          return acc;
+        },
+        { r: 0, g: 0, b: 0 },
+      );
+
+      const bgR = bg.r / corners.length;
+      const bgG = bg.g / corners.length;
+      const bgB = bg.b / corners.length;
+      const threshold = 70;
+
+      const visited = new Uint8Array(width * height);
+      const queue = new Uint32Array(width * height);
+      let head = 0;
+      let tail = 0;
+
+      const enqueue = (x: number, y: number) => {
+        const index = y * width + x;
+        if (!visited[index]) {
+          visited[index] = 1;
+          queue[tail++] = index;
+        }
+      };
+
+      const matchesBackground = (index: number) => {
+        const i = index * 4;
+        const dr = data[i] - bgR;
+        const dg = data[i + 1] - bgG;
+        const db = data[i + 2] - bgB;
+        return Math.sqrt(dr * dr + dg * dg + db * db) < threshold;
+      };
+
+      for (let x = 0; x < width; x += 1) {
+        enqueue(x, 0);
+        enqueue(x, height - 1);
+      }
+      for (let y = 1; y < height - 1; y += 1) {
+        enqueue(0, y);
+        enqueue(width - 1, y);
+      }
+
+      while (head < tail) {
+        const index = queue[head++];
+        if (!matchesBackground(index)) continue;
+
+        const i = index * 4;
+        data[i + 3] = 0;
+
+        const x = index % width;
+        const y = Math.floor(index / width);
+        if (x > 0) enqueue(x - 1, y);
+        if (x < width - 1) enqueue(x + 1, y);
+        if (y > 0) enqueue(x, y - 1);
+        if (y < height - 1) enqueue(x, y + 1);
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      setCapsuleClassic50Transparent(canvas.toDataURL("image/png"));
+    };
+  }, []);
+
   const increaseCapsule = (id: string) => {
     setCapsuleQty((prev) => ({ ...prev, [id]: prev[id] + 1 }));
   };
@@ -145,7 +257,7 @@ const Capsules = () => {
   };
 
   const clearCart = () => {
-    setCapsuleQty({ classic: 0, aroma: 0, black: 0 });
+    setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
   };
 
   const handleCapsuleOrderSubmit = async () => {
@@ -160,14 +272,14 @@ const Capsules = () => {
         customerPhone: orderForm.customerPhone || undefined,
         note: orderForm.note || undefined,
         items: selectedCapsules.map((product) => ({
-          productId: `capsules-${product.id}`,
+          productId: product.id,
           quantity: capsuleQty[product.id],
         })),
       });
 
       setOrderSubmitState("success");
       setOrderSubmitMessage("Order request sent successfully.");
-      setCapsuleQty({ classic: 0, aroma: 0, black: 0 });
+      setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
       setOrderForm({ customerName: "", customerEmail: "", customerPhone: "", note: "" });
     } catch (error) {
       setOrderSubmitState("error");
@@ -226,61 +338,63 @@ const Capsules = () => {
 
         <div className={`mt-12 grid grid-cols-1 gap-10 ${hasCapsuleSelection ? "lg:grid-cols-[minmax(0,7fr)_minmax(320px,3fr)]" : ""}`}>
           <div
-            className={`grid grid-cols-1 gap-8 ${
-              hasCapsuleSelection ? "md:grid-cols-2 xl:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"
-            }`}
+            className="flex flex-col gap-8 md:flex-row md:flex-wrap md:items-stretch"
           >
             {capsuleProducts.map((product) => (
               <article
                 key={product.id}
-                className="rounded-[12px] border border-[#ece6df] bg-white p-7 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)]"
+                className={`flex w-full flex-col rounded-[12px] border border-[#ece6df] bg-white p-5 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)] ${
+                  hasCapsuleSelection ? "md:basis-[calc(50%-1rem)]" : "md:basis-[calc(50%-1rem)] xl:basis-[calc(33.333%-1.34rem)]"
+                }`}
               >
-                <div className="flex min-h-[260px] items-center justify-center rounded-xl bg-[#f7f7f7] p-6">
+                <div className="flex h-[250px] items-center justify-center p-3">
                   <img
-                    src={product.image}
+                    src={product.id === "capsules-classic-50x" ? capsuleClassic50Transparent : product.image}
                     alt={product.name}
-                    className="mx-auto h-52 w-52 rounded-full bg-[#f0f0f0] object-contain p-4"
+                    className={`mx-auto h-[220px] w-full object-contain ${product.imageClassName ?? ""}`}
                   />
                 </div>
 
-                <div className="mt-4 flex items-start justify-between gap-3">
-                  <h2 className="font-['Playfair_Display',serif] text-2xl leading-tight">{product.name}</h2>
-                  <p className="text-lg font-bold text-[#9e0102]">EUR {product.price.toFixed(2)}</p>
-                </div>
-                <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
-
-                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-[#3b3b3b] md:text-sm">
-                  <p><span className="font-semibold">Weight:</span> {product.netWeight}</p>
-                  <p><span className="font-semibold">Roast:</span> {product.roast}</p>
-                  <p><span className="font-semibold">Intensity:</span> {product.intensity}</p>
-                  <p><span className="font-semibold">Format:</span> Box of 10 capsules</p>
-                  <p className="col-span-2"><span className="font-semibold">Compatibility:</span> {product.compatibility}</p>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between text-xs">
-                  <p className="font-semibold text-green-700">In stock</p>
-                  <p className="text-[#5a5a5a]">Dispatch in 24h</p>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between border-t border-[#e6ddd4] pt-4">
-                  <div className="inline-flex items-center rounded-md border border-[#cab8a6]">
-                    <button
-                      type="button"
-                      onClick={() => decreaseCapsule(product.id)}
-                      className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
-                    >
-                      -
-                    </button>
-                    <span className="w-10 text-center text-sm font-semibold">{capsuleQty[product.id]}</span>
-                    <button
-                      type="button"
-                      onClick={() => increaseCapsule(product.id)}
-                      className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
-                    >
-                      +
-                    </button>
+                <div className="mt-4 flex flex-1 flex-col">
+                  <div className="flex items-start justify-between gap-3">
+                    <h2 className="font-['Playfair_Display',serif] text-2xl leading-tight">{product.name}</h2>
+                    <p className="text-lg font-bold text-[#9e0102]">EUR {product.price.toFixed(2)}</p>
                   </div>
-                  <p className="text-xs text-[#5d554e]">VAT included</p>
+                  <p className="mt-2 min-h-[96px] text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
+
+                  <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-[#3b3b3b] md:text-sm">
+                    <p><span className="font-semibold">Weight:</span> {product.netWeight}</p>
+                    <p><span className="font-semibold">Roast:</span> {product.roast}</p>
+                    <p><span className="font-semibold">Intensity:</span> {product.intensity}</p>
+                    <p><span className="font-semibold">Format:</span> {product.format}</p>
+                    <p className="col-span-2"><span className="font-semibold">Compatibility:</span> {product.compatibility}</p>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between text-xs">
+                    <p className="font-semibold text-green-700">In stock</p>
+                    <p className="text-[#5a5a5a]">Dispatch in 24h</p>
+                  </div>
+
+                  <div className="mt-auto flex items-center justify-between border-t border-[#e6ddd4] pt-4">
+                    <div className="inline-flex items-center rounded-md border border-[#cab8a6]">
+                      <button
+                        type="button"
+                        onClick={() => decreaseCapsule(product.id)}
+                        className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
+                      >
+                        -
+                      </button>
+                      <span className="w-10 text-center text-sm font-semibold">{capsuleQty[product.id]}</span>
+                      <button
+                        type="button"
+                        onClick={() => increaseCapsule(product.id)}
+                        className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs text-[#5d554e]">VAT included</p>
+                  </div>
                 </div>
               </article>
             ))}

@@ -10,6 +10,14 @@ export const PRODUCT_SEEDS = [
     inStock: true,
   },
   {
+    code: "capsules-classic-50x",
+    name: "Capsules Classic 50x",
+    category: ProductCategory.capsules,
+    description: "Classic flavor profile in a larger 50-capsule box.",
+    priceEur: 28.9,
+    inStock: true,
+  },
+  {
     code: "capsules-aroma",
     name: "Capsules Aroma",
     category: ProductCategory.capsules,
