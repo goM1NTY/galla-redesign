@@ -14,25 +14,19 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
     en: [
       { label: "All Products", href: "/all-products" },
       { label: "About Us", href: "#about" },
-      { label: "Galla Espresso", href: "#espresso" },
       { label: "Capsules", href: "/capsules" },
-      { label: "Black Premium", href: "#premium" },
       { label: "Contact", href: "#contact" },
     ],
     sq: [
       { label: "Të Gjitha Produktet", href: "/all-products" },
       { label: "Rreth Nesh", href: "#about" },
-      { label: "Galla Espresso", href: "#espresso" },
       { label: "Kapsula", href: "/capsules" },
-      { label: "Black Premium", href: "#premium" },
       { label: "Kontakt", href: "#contact" },
     ],
     mk: [
       { label: "Сите Производи", href: "/all-products" },
       { label: "За Нас", href: "#about" },
-      { label: "Galla Espresso", href: "#espresso" },
       { label: "Капсули", href: "/capsules" },
-      { label: "Black Premium", href: "#premium" },
       { label: "Контакт", href: "#contact" },
     ],
   };
@@ -135,7 +129,7 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
 
   return (
     <header className="bg-[#9e0102] text-white">
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-2 pt-4 md:pt-5">
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-1.5 pt-3.5 md:pt-4">
         <div className="absolute right-4 top-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em] md:text-xs">
           <button
             type="button"
@@ -167,7 +161,7 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
           />
         </div>
 
-        <nav className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[10px] font-semibold uppercase tracking-wide md:text-xs">
+        <nav className="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] font-semibold uppercase tracking-wide md:text-[13px]">
           {navItems[lang].map((item) => (
             <a key={item.label} href={item.href} className="transition-opacity hover:opacity-80">
               {item.label}

@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
 import capsuleClassic from "@/assets/yellow.jpeg";
@@ -77,11 +77,29 @@ const espressoProducts = [
   },
 ];
 
+const CART_STORAGE_KEY = "galla_capsules_cart";
+
 const Capsules = () => {
-  const [capsuleQty, setCapsuleQty] = useState<Record<string, number>>({
-    classic: 0,
-    aroma: 0,
-    black: 0,
+  const [capsuleQty, setCapsuleQty] = useState<Record<string, number>>(() => {
+    if (typeof window === "undefined") {
+      return { classic: 0, aroma: 0, black: 0 };
+    }
+
+    const saved = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!saved) {
+      return { classic: 0, aroma: 0, black: 0 };
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as Record<string, number>;
+      return {
+        classic: Math.max(0, Number(parsed.classic) || 0),
+        aroma: Math.max(0, Number(parsed.aroma) || 0),
+        black: Math.max(0, Number(parsed.black) || 0),
+      };
+    } catch {
+      return { classic: 0, aroma: 0, black: 0 };
+    }
   });
 
   const selectedCapsules = useMemo(
@@ -112,12 +130,20 @@ const Capsules = () => {
   const [espressoSubmitState, setEspressoSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [espressoSubmitMessage, setEspressoSubmitMessage] = useState("");
 
+  useEffect(() => {
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(capsuleQty));
+  }, [capsuleQty]);
+
   const increaseCapsule = (id: string) => {
     setCapsuleQty((prev) => ({ ...prev, [id]: prev[id] + 1 }));
   };
 
   const decreaseCapsule = (id: string) => {
     setCapsuleQty((prev) => ({ ...prev, [id]: Math.max(0, prev[id] - 1) }));
+  };
+
+  const clearCart = () => {
+    setCapsuleQty({ classic: 0, aroma: 0, black: 0 });
   };
 
   const handleCapsuleOrderSubmit = async () => {
@@ -179,7 +205,7 @@ const Capsules = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#1f1f1f]">
-      <CompactHeader />
+      <CompactHeader cartCount={totalCapsulePacks} cartHref="#order-summary" />
       <div className="py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mx-auto max-w-3xl text-center">
@@ -253,11 +279,20 @@ const Capsules = () => {
           </div>
 
           {hasCapsuleSelection && (
-          <aside className="h-fit rounded-2xl border border-[#d6c8bb] bg-white p-6 shadow-md md:sticky md:top-6">
+          <aside id="order-summary" className="h-fit rounded-2xl border border-[#d6c8bb] bg-white p-6 shadow-md md:sticky md:top-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9e0102]">Order Summary</p>
-            <p className="mt-2 text-sm text-[#4a4a4a]">
-              Packs selected: <span className="font-semibold text-[#1f1f1f]">{totalCapsulePacks}</span>
-            </p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="text-sm text-[#4a4a4a]">
+                Packs selected: <span className="font-semibold text-[#1f1f1f]">{totalCapsulePacks}</span>
+              </p>
+              <button
+                type="button"
+                onClick={clearCart}
+                className="rounded-md border border-[#d6c8bb] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#7a6a5e] transition-colors hover:bg-[#f8f3ee]"
+              >
+                Empty Cart
+              </button>
+            </div>
 
             <div className="mt-4 space-y-3">
               <input

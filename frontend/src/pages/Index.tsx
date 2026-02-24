@@ -8,6 +8,7 @@ import aromaCoffee from "@/assets/aroma-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import espressoPhoto from "@/assets/5.jpeg";
+import capsulesClassic from "@/assets/capsules_classic.png";
 
 type Language = "en" | "sq" | "mk";
 
@@ -174,6 +175,7 @@ const Index = () => {
   const [lang, setLang] = useState<Language>("en");
   const t = translations[lang];
   const [productsCarouselApi, setProductsCarouselApi] = useState<CarouselApi>();
+  const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [showCapsulesPopup, setShowCapsulesPopup] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -187,15 +189,28 @@ const Index = () => {
   useEffect(() => {
     if (!productsCarouselApi) return;
 
+    const onSelect = () => {
+      const visibleSlides = productsCarouselApi.slidesInView();
+      const middleVisibleIndex = visibleSlides[Math.floor(visibleSlides.length / 2)];
+      setActiveProductIndex(
+        typeof middleVisibleIndex === "number" ? middleVisibleIndex : productsCarouselApi.selectedScrollSnap(),
+      );
+    };
+    onSelect();
+    productsCarouselApi.on("select", onSelect);
+    productsCarouselApi.on("reInit", onSelect);
+
     const intervalId = window.setInterval(() => {
       if (productsCarouselApi.canScrollNext()) {
         productsCarouselApi.scrollNext();
       } else {
         productsCarouselApi.scrollTo(0);
       }
-    }, 5000);
+    }, 4800);
 
     return () => {
+      productsCarouselApi.off("select", onSelect);
+      productsCarouselApi.off("reInit", onSelect);
       window.clearInterval(intervalId);
     };
   }, [productsCarouselApi]);
@@ -211,6 +226,12 @@ const Index = () => {
   }, []);
 
   const products = [
+    {
+      id: 5,
+      name: "GALLA CAPSULES CLASSIC",
+      image: capsulesClassic,
+      imageClassName: "scale-105 md:scale-110 brightness-110 contrast-110",
+    },
     {
       id: 1,
       name: "GALLA CLASSIC",
@@ -230,6 +251,7 @@ const Index = () => {
       id: 4,
       name: "GALLA BLACK PREMIUM",
       image: blackCoffee,
+      imageClassName: "scale-56 md:scale-66",
     },
   ];
 
@@ -302,20 +324,38 @@ const Index = () => {
         </div>
       )}
 
-      <section id="products" className="py-12 md:py-14">
+      <section id="products" className="pt-8 pb-16 md:pt-10 md:pb-20">
         <div className="mx-auto max-w-7xl px-4">
           <Carousel
             setApi={setProductsCarouselApi}
             opts={{
-              align: "start",
+              align: "center",
               loop: true,
             }}
             className="w-full"
           >
             <CarouselContent>
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <CarouselItem key={product.id} className="basis-full md:basis-1/2 lg:basis-1/3">
-                  <ProductCard image={product.image} name={product.name} />
+                  <div className="relative mx-auto w-fit">
+                    <ProductCard
+                      image={product.image}
+                      name={product.name}
+                      imageClassName={`${product.imageClassName || ""} transition-transform duration-500 ${
+                        index === activeProductIndex ? "scale-104 md:scale-108" : "scale-97 md:scale-100"
+                      }`}
+                      overlay={
+                        product.id === 5 ? (
+                          <a
+                            href="/capsules"
+                            className="inline-flex items-center rounded-bl-md rounded-tr-md bg-[#9e0102] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-white shadow-lg ring-1 ring-white/30 animate-pulse transition-opacity hover:opacity-90 md:text-xs"
+                          >
+                            Order Now
+                          </a>
+                        ) : undefined
+                      }
+                    />
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
