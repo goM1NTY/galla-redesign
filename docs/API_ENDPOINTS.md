@@ -1,8 +1,17 @@
 # API Endpoints
 
-This project includes a backend API in `backend/` (Express + TypeScript).
+This project includes a backend API in `backend/` (Express + TypeScript + Prisma + PostgreSQL).
 
 Base URL (local): `http://localhost:4000`
+
+Data is persisted in PostgreSQL tables:
+
+- `products`
+- `orders`
+- `order_items`
+- `espresso_inquiries`
+- `espresso_inquiry_products`
+- `contact_messages`
 
 ## Health
 

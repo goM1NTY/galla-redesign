@@ -1,12 +1,11 @@
 import { Router } from "express";
-import { randomUUID } from "node:crypto";
+import { ProductCategory } from "@prisma/client";
 import { z } from "zod";
-import { capsuleOrders, espressoInquiries, products } from "../data/store.js";
+import { prisma } from "../lib/prisma.js";
 import {
   sendCapsuleOrderNotification,
   sendEspressoInquiryNotification,
 } from "../services/email.js";
-import type { CapsuleOrder, EspressoInquiry } from "../types.js";
 
 const capsuleOrderSchema = z.object({
   customerName: z.string().trim().min(2),
@@ -43,8 +42,12 @@ ordersRouter.post("/capsules", async (req, res) => {
     });
   }
 
-  const capsuleProductIds = new Set(products.filter((p) => p.category === "capsules").map((p) => p.id));
-  const unknownItems = parsed.data.items.filter((item) => !capsuleProductIds.has(item.productId));
+  const capsuleProducts = await prisma.product.findMany({
+    where: { category: ProductCategory.capsules },
+    select: { id: true, code: true },
+  });
+  const productCodeToId = new Map(capsuleProducts.map((product) => [product.code, product.id]));
+  const unknownItems = parsed.data.items.filter((item) => !productCodeToId.has(item.productId));
   if (unknownItems.length > 0) {
     return res.status(400).json({
       success: false,
@@ -53,29 +56,50 @@ ordersRouter.post("/capsules", async (req, res) => {
     });
   }
 
-  const order: CapsuleOrder = {
-    id: randomUUID(),
-    customerName: parsed.data.customerName,
-    customerEmail: parsed.data.customerEmail,
-    customerPhone: parsed.data.customerPhone,
-    note: parsed.data.note,
-    items: parsed.data.items,
-    createdAt: new Date().toISOString(),
-  };
-
-  capsuleOrders.push(order);
+  const order = await prisma.order.create({
+    data: {
+      customerName: parsed.data.customerName,
+      customerEmail: parsed.data.customerEmail,
+      customerPhone: parsed.data.customerPhone,
+      note: parsed.data.note,
+      items: {
+        create: parsed.data.items.map((item) => ({
+          productId: productCodeToId.get(item.productId)!,
+          quantity: item.quantity,
+        })),
+      },
+    },
+  });
   let emailSent = false;
   try {
-    const emailResult = await sendCapsuleOrderNotification(order);
+    const emailResult = await sendCapsuleOrderNotification({
+      id: order.id,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      customerPhone: order.customerPhone ?? undefined,
+      note: order.note ?? undefined,
+      items: parsed.data.items,
+      createdAt: order.createdAt.toISOString(),
+    });
     emailSent = emailResult.sent;
   } catch (error) {
     console.error("Failed to send capsule order notification", error);
   }
 
+  const responseData = {
+    id: order.id,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    customerPhone: order.customerPhone,
+    note: order.note,
+    items: parsed.data.items,
+    createdAt: order.createdAt,
+  };
+
   return res.status(201).json({
     success: true,
     emailSent,
-    data: order,
+    data: responseData,
   });
 });
 
@@ -89,8 +113,12 @@ ordersRouter.post("/espresso-inquiry", async (req, res) => {
     });
   }
 
-  const espressoProductIds = new Set(products.filter((p) => p.category === "espresso").map((p) => p.id));
-  const unknownProducts = parsed.data.products.filter((productId) => !espressoProductIds.has(productId));
+  const espressoProducts = await prisma.product.findMany({
+    where: { category: ProductCategory.espresso },
+    select: { id: true, code: true },
+  });
+  const espressoCodeToId = new Map(espressoProducts.map((product) => [product.code, product.id]));
+  const unknownProducts = parsed.data.products.filter((productCode) => !espressoCodeToId.has(productCode));
   if (unknownProducts.length > 0) {
     return res.status(400).json({
       success: false,
@@ -99,28 +127,48 @@ ordersRouter.post("/espresso-inquiry", async (req, res) => {
     });
   }
 
-  const inquiry: EspressoInquiry = {
-    id: randomUUID(),
-    customerName: parsed.data.customerName,
-    customerEmail: parsed.data.customerEmail,
-    customerPhone: parsed.data.customerPhone,
-    products: parsed.data.products,
-    message: parsed.data.message,
-    createdAt: new Date().toISOString(),
-  };
-
-  espressoInquiries.push(inquiry);
+  const inquiry = await prisma.espressoInquiry.create({
+    data: {
+      customerName: parsed.data.customerName,
+      customerEmail: parsed.data.customerEmail,
+      customerPhone: parsed.data.customerPhone,
+      message: parsed.data.message,
+      products: {
+        create: parsed.data.products.map((productCode) => ({
+          productId: espressoCodeToId.get(productCode)!,
+        })),
+      },
+    },
+  });
   let emailSent = false;
   try {
-    const emailResult = await sendEspressoInquiryNotification(inquiry);
+    const emailResult = await sendEspressoInquiryNotification({
+      id: inquiry.id,
+      customerName: inquiry.customerName,
+      customerEmail: inquiry.customerEmail,
+      customerPhone: inquiry.customerPhone ?? undefined,
+      products: parsed.data.products,
+      message: inquiry.message ?? undefined,
+      createdAt: inquiry.createdAt.toISOString(),
+    });
     emailSent = emailResult.sent;
   } catch (error) {
     console.error("Failed to send espresso inquiry notification", error);
   }
 
+  const responseData = {
+    id: inquiry.id,
+    customerName: inquiry.customerName,
+    customerEmail: inquiry.customerEmail,
+    customerPhone: inquiry.customerPhone,
+    products: parsed.data.products,
+    message: inquiry.message,
+    createdAt: inquiry.createdAt,
+  };
+
   return res.status(201).json({
     success: true,
     emailSent,
-    data: inquiry,
+    data: responseData,
   });
 });

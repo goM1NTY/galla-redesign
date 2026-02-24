@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               String                  @id @default(cuid())
+  code             String                  @unique
+  name             String
+  category         ProductCategory
+  description      String
+  priceEur         Float?
+  inStock          Boolean                 @default(true)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  orderItems       OrderItem[]
+  inquiryProducts  EspressoInquiryProduct[]
+
+  @@map("products")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  note          String?
+  createdAt     DateTime    @default(now())
+  items         OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model EspressoInquiry {
+  id            String                  @id @default(cuid())
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  message       String?
+  createdAt     DateTime                @default(now())
+  products      EspressoInquiryProduct[]
+
+  @@map("espresso_inquiries")
+}
+
+model EspressoInquiryProduct {
+  id         String          @id @default(cuid())
+  inquiryId  String
+  productId  String
+  inquiry    EspressoInquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  product    Product         @relation(fields: [productId], references: [id])
+
+  @@map("espresso_inquiry_products")
+}
+
+enum ProductCategory {
+  capsules
+  espresso
+}

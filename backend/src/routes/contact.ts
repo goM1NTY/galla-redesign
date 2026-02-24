@@ -1,9 +1,7 @@
 import { Router } from "express";
-import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { contactMessages } from "../data/store.js";
+import { prisma } from "../lib/prisma.js";
 import { sendContactNotification } from "../services/email.js";
-import type { ContactMessage } from "../types.js";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2),
@@ -25,19 +23,25 @@ contactRouter.post("/", async (req, res) => {
   }
 
   const payload = parsed.data;
-  const record: ContactMessage = {
-    id: randomUUID(),
-    name: payload.name,
-    email: payload.email,
-    subject: payload.subject,
-    message: payload.message,
-    createdAt: new Date().toISOString(),
-  };
+  const record = await prisma.contactMessage.create({
+    data: {
+      name: payload.name,
+      email: payload.email,
+      subject: payload.subject,
+      message: payload.message,
+    },
+  });
 
-  contactMessages.push(record);
   let emailSent = false;
   try {
-    const emailResult = await sendContactNotification(record);
+    const emailResult = await sendContactNotification({
+      id: record.id,
+      name: record.name,
+      email: record.email,
+      subject: record.subject ?? undefined,
+      message: record.message,
+      createdAt: record.createdAt.toISOString(),
+    });
     emailSent = emailResult.sent;
   } catch (error) {
     console.error("Failed to send contact notification", error);

@@ -4,6 +4,8 @@ import express from "express";
 import { contactRouter } from "./routes/contact.js";
 import { ordersRouter } from "./routes/orders.js";
 import { productsRouter } from "./routes/products.js";
+import { ensureSeedProducts } from "./services/bootstrap.js";
+import { prisma } from "./lib/prisma.js";
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -26,6 +28,16 @@ app.use((req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`API running on http://localhost:${port}`);
+async function startServer() {
+  await ensureSeedProducts();
+
+  app.listen(port, () => {
+    console.log(`API running on http://localhost:${port}`);
+  });
+}
+
+startServer().catch(async (error) => {
+  console.error("Failed to start server", error);
+  await prisma.$disconnect();
+  process.exit(1);
 });
