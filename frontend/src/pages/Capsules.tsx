@@ -15,7 +15,8 @@ const capsuleProducts = [
     id: "classic",
     name: "Capsules Classic",
     image: capsuleClassic,
-    description: "Balanced and smooth cup with soft crema, designed for everyday espresso moments.",
+    description:
+      "The quintessential Galla experience. A harmonious blend with a velvety crema and a smooth, lingering finish.",
     price: 6.4,
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium",
@@ -26,7 +27,8 @@ const capsuleProducts = [
     id: "aroma",
     name: "Capsules Aroma",
     image: capsuleAroma,
-    description: "Aromatic profile with richer fragrance and elegant aftertaste for specialty coffee lovers.",
+    description:
+      "An olfactory journey. This medium-dark roast reveals deep floral notes and a sophisticated, cocoa-toned aftertaste.",
     price: 6.9,
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium-Dark",
@@ -204,39 +206,45 @@ const Capsules = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#1f1f1f]">
+    <div className="min-h-screen bg-white font-['Inter',sans-serif] text-[#1f1f1f]">
       <CompactHeader cartCount={totalCapsulePacks} cartHref="#order-summary" />
-      <div className="py-12 md:py-16">
+      <div className="pb-14 pt-20 md:pb-20 md:pt-24">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9e0102]">New Product Line</p>
-          <h1 className="mt-2 font-serif text-4xl md:text-5xl">Galla Capsules</h1>
-          <p className="mt-4 text-base leading-8 text-[#3a3a3a] md:text-lg">
-            Capsules are now part of the Galla portfolio. Choose Classic, Aroma, or Black and place an order with a
-            standard checkout-style summary.
+          <p className="text-xs uppercase tracking-[0.1em] text-[#787878]">
+            <Link to="/" className="transition-colors hover:text-[#9e0102]">
+              Home
+            </Link>{" "}
+            &gt; <span className="text-[#9e0102]">Capsules</span>
           </p>
-          <Link
-            to="/"
-            className="mt-5 inline-flex items-center rounded-md border border-[#cab8a6] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#5f5347] transition-colors hover:bg-[#f7f1ea]"
-          >
-            Back To Home
-          </Link>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9e0102]">New Product Line</p>
+          <h1 className="mt-3 font-['Playfair_Display',serif] text-4xl md:text-5xl">The Art of Espresso, Encapsulated</h1>
+          <p className="mt-4 text-base leading-8 text-[#3a3a3a] md:text-lg">
+            Discover the exquisite Galla collection.
+          </p>
         </div>
 
-        <div className={`mt-10 grid grid-cols-1 gap-8 ${hasCapsuleSelection ? "lg:grid-cols-[1.55fr_1fr]" : ""}`}>
-          <div className={`grid grid-cols-1 gap-6 md:grid-cols-2 ${hasCapsuleSelection ? "" : "lg:grid-cols-3"}`}>
+        <div className={`mt-12 grid grid-cols-1 gap-10 ${hasCapsuleSelection ? "lg:grid-cols-[minmax(0,7fr)_minmax(320px,3fr)]" : ""}`}>
+          <div
+            className={`grid grid-cols-1 gap-8 ${
+              hasCapsuleSelection ? "md:grid-cols-2 xl:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"
+            }`}
+          >
             {capsuleProducts.map((product) => (
-              <article key={product.id} className="rounded-2xl border border-[#dbcfc4] bg-white p-6 shadow-md">
-                <div className="rounded-xl bg-[#f7f3ee] p-4">
+              <article
+                key={product.id}
+                className="rounded-[12px] border border-[#ece6df] bg-white p-7 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)]"
+              >
+                <div className="flex min-h-[260px] items-center justify-center rounded-xl bg-[#f7f7f7] p-6">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="mx-auto h-40 w-40 rounded-full object-cover md:h-44 md:w-44"
+                    className="mx-auto h-52 w-52 rounded-full bg-[#f0f0f0] object-contain p-4"
                   />
                 </div>
 
                 <div className="mt-4 flex items-start justify-between gap-3">
-                  <h2 className="font-serif text-2xl leading-tight">{product.name}</h2>
+                  <h2 className="font-['Playfair_Display',serif] text-2xl leading-tight">{product.name}</h2>
                   <p className="text-lg font-bold text-[#9e0102]">EUR {product.price.toFixed(2)}</p>
                 </div>
                 <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
@@ -279,7 +287,7 @@ const Capsules = () => {
           </div>
 
           {hasCapsuleSelection && (
-          <aside id="order-summary" className="h-fit rounded-2xl border border-[#d6c8bb] bg-white p-6 shadow-md md:sticky md:top-6">
+          <aside id="order-summary" className="h-fit rounded-[12px] border border-[#e8e1d8] bg-white p-6 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9e0102]">Order Summary</p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-sm text-[#4a4a4a]">
@@ -300,28 +308,28 @@ const Capsules = () => {
                 value={orderForm.customerName}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerName: event.target.value }))}
                 placeholder="Your name"
-                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+                className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
               <input
                 type="email"
                 value={orderForm.customerEmail}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerEmail: event.target.value }))}
                 placeholder="Your email"
-                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+                className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
               <input
                 type="text"
                 value={orderForm.customerPhone}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
                 placeholder="Phone (optional)"
-                className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+                className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
               <textarea
                 value={orderForm.note}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, note: event.target.value }))}
                 placeholder="Order note (optional)"
                 rows={3}
-                className="w-full resize-y rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
+                className="w-full resize-y rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
             </div>
 
@@ -359,9 +367,9 @@ const Capsules = () => {
               disabled={
                 orderSubmitState === "loading" || !orderForm.customerName || !orderForm.customerEmail || !hasCapsuleSelection
               }
-              className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-[#9e0102] px-5 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-[#8B1A1A] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors duration-200 hover:bg-[#741313]"
             >
-              {orderSubmitState === "loading" ? "Submitting..." : "Proceed To Order"}
+              {orderSubmitState === "loading" ? "Submitting..." : "Place Order"}
             </button>
             {orderSubmitState !== "idle" && (
               <p className={`mt-2 text-xs ${orderSubmitState === "success" ? "text-green-700" : "text-red-700"}`}>
@@ -377,7 +385,7 @@ const Capsules = () => {
 
         <div className="mt-16 border-t border-[#dbcfc4] pt-12">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9e0102]">Espresso Products</p>
-          <h2 className="mt-2 font-serif text-3xl md:text-4xl">Also Available To Order</h2>
+          <h2 className="mt-2 font-['Playfair_Display',serif] text-3xl md:text-4xl">Also Available To Order</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[#4a4a4a] md:text-base">
             Classic, Aroma, Cream, and Black espresso are also available for purchase. Prices are not displayed yet.
             Contact us for order details.
@@ -389,7 +397,7 @@ const Capsules = () => {
                 <div className="rounded-xl bg-[#f7f3ee] p-4">
                   <img src={product.image} alt={product.name} className="mx-auto h-40 w-auto object-contain md:h-44" />
                 </div>
-                <h3 className="mt-4 font-serif text-2xl text-[#1f1f1f]">{product.name}</h3>
+                <h3 className="mt-4 font-['Playfair_Display',serif] text-2xl text-[#1f1f1f]">{product.name}</h3>
                 <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#9e0102]">Available For Order</p>

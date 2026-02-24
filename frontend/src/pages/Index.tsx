@@ -8,7 +8,9 @@ import aromaCoffee from "@/assets/aroma-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import espressoPhoto from "@/assets/5.jpeg";
+import capsulesPhoto from "@/assets/capsules.jpeg";
 import capsulesClassic from "@/assets/capsules_classic.png";
+import capsulesAromaCustom from "@/assets/capsules_aroma_custom.png";
 
 type Language = "en" | "sq" | "mk";
 
@@ -31,10 +33,10 @@ const translations = {
     p200Label: "200 Premium",
     p200Desc: "Since 2016, our distribution network includes Black Premium espresso, crafted from the finest coffee varieties in carefully balanced proportions.",
     hospitalityLabel: "For Hospitality",
-    hospitalityDesc: "With peak flavor and creamy consistency, this premium blend is designed for hotels and exclusive catering facilities that demand high-quality espresso service.",
+    hospitalityDesc: "With rich flavor and consistent crema, this premium blend supports high-standard espresso service in premium hospitality settings.",
     signatureProduct: "Signature Product",
-    premiumQuoteText: "We believe that in a short period of time, hoteliers and exclusive catering facilities in Macedonia and other countries will clearly recognize the difference of this product compared to competitors.",
-    premiumQuote: "Once you try this coffee, you become its fan forever.",
+    premiumQuoteText: "From the very first cup, the difference is unmistakable.",
+    premiumQuote: "Once experienced, this coffee becomes a lasting favorite.",
     capsulesLabel: "New Product Line",
     capsulesTitle: "Galla Capsules",
     capsulesIntro: "Capsules are now part of the Galla portfolio. Choose Classic, Aroma, or Black and place an order with a standard checkout-style summary.",
@@ -76,9 +78,9 @@ const translations = {
     promiseLabel: "Our Promise",
     promiseText: "From sourcing to final packaging, each step is guided by one promise: dependable quality in every cup. Galla works to bring the warmth of true espresso culture to everyday life with products consumers can trust and enjoy every day.",
     mission: "Mission",
-    missionText: "Our mission is to meet the needs, tastes, and desires of consumers through quality, experienced people, modern technology, and continuous product innovation.",
+    missionText: "Our mission is to serve customers with dependable quality, honest craftsmanship, and steady improvement in every product we make.",
     vision: "Vision",
-    visionText: "Our vision is for Galla Kaffe to become a recognized brand in our country and across Europe by delivering quality and value that belong at every table.",
+    visionText: "Our vision is to grow responsibly as a trusted regional coffee brand, known for consistency, care, and long-term relationships with customers and partners.",
     contactUs: "Contact Us",
     infoAddress: "Information & Address",
     kosovo: "Kosovo",
@@ -228,8 +230,14 @@ const Index = () => {
   const products = [
     {
       id: 5,
-      name: "GALLA CAPSULES CLASSIC",
+      name: "GALLA CLASSIC - CAPSULES",
       image: capsulesClassic,
+      imageClassName: "scale-105 md:scale-110 brightness-110 contrast-110",
+    },
+    {
+      id: 6,
+      name: "GALLA AROMA - CAPSULES",
+      image: capsulesAromaCustom,
       imageClassName: "scale-105 md:scale-110 brightness-110 contrast-110",
     },
     {
@@ -251,7 +259,7 @@ const Index = () => {
       id: 4,
       name: "GALLA BLACK PREMIUM",
       image: blackCoffee,
-      imageClassName: "scale-56 md:scale-66",
+      imageClassName: "scale-42 md:scale-52",
     },
   ];
 
@@ -280,8 +288,8 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header lang={lang} onLangChange={setLang} />
       {showCapsulesPopup && (
-        <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/35 px-4">
-          <div className="relative w-full max-w-6xl rounded-2xl border border-[#e2d4c7] bg-white p-6 shadow-2xl md:p-8">
+        <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/45 px-4 backdrop-blur-[8px]">
+          <div className="relative w-full max-w-5xl rounded-2xl border border-[#e2d4c7] bg-white p-5 shadow-2xl md:p-7">
             <button
               type="button"
               onClick={() => setShowCapsulesPopup(false)}
@@ -291,34 +299,34 @@ const Index = () => {
               ×
             </button>
 
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9e0102]">{t.capsulesLabel}</p>
-            <h2 className="mt-2 font-serif text-3xl text-[#1f1f1f] md:text-5xl">{t.capsulesTitle}</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#4a4a4a] md:text-base">
-              {t.capsulesIntro}
-            </p>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-5 md:gap-8">
+              <div className="md:col-span-2">
+                <div className="flex h-full min-h-[290px] items-center justify-center rounded-xl bg-[#f4f4f4] p-5">
+                  <img
+                    src={capsulesPhoto}
+                    alt="Galla Black and capsules"
+                    className="h-72 w-auto rounded-lg object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.25)] md:h-[22rem]"
+                  />
+                </div>
+              </div>
 
-            <div className="relative mt-5 flex items-center justify-end md:mt-3">
-              <svg
-                viewBox="0 0 420 110"
-                className="pointer-events-none absolute -top-14 right-28 hidden h-24 w-[24rem] md:block"
-                aria-hidden="true"
-              >
-                <path
-                  d="M6 22 C 130 2, 220 102, 395 86"
-                  fill="none"
-                  stroke="#b95a58"
-                  strokeWidth="2"
-                  strokeDasharray="6 6"
-                />
-                <path d="M386 78 L398 86 L384 92" fill="none" stroke="#b95a58" strokeWidth="2" />
-              </svg>
+              <div className="flex flex-col md:col-span-3 md:min-h-[290px]">
+                <h2 className="font-['Playfair_Display',serif] text-3xl text-[#1f1f1f] md:text-5xl">
+                  Discover Galla Capsules
+                </h2>
+                <p className="mt-4 max-w-[48ch] text-sm leading-7 text-[#4a4a4a] md:text-base">
+                  Experience espresso perfection. Explore our new Classic, Aroma, and Black collections.
+                </p>
 
-              <a
-                href="/capsules"
-                className="inline-flex items-center rounded-md bg-[#9e0102] px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90 md:text-sm"
-              >
-                Explore Capsules
-              </a>
+                <div className="mt-6 md:mt-auto md:flex md:justify-end">
+                  <a
+                    href="/capsules"
+                    className="inline-flex items-center rounded-md bg-[#8B1A1A] px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#741313] md:text-sm"
+                  >
+                    Explore Capsules
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

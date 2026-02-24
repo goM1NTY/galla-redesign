@@ -12,19 +12,19 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
   const [logoSrc, setLogoSrc] = useState(gallaLogo);
   const navItems = {
     en: [
-      { label: "All Products", href: "/all-products" },
+      { label: "Collections", href: "/all-products" },
       { label: "About Us", href: "#about" },
       { label: "Capsules", href: "/capsules" },
       { label: "Contact", href: "#contact" },
     ],
     sq: [
-      { label: "Të Gjitha Produktet", href: "/all-products" },
+      { label: "Koleksioni", href: "/all-products" },
       { label: "Rreth Nesh", href: "#about" },
       { label: "Kapsula", href: "/capsules" },
       { label: "Kontakt", href: "#contact" },
     ],
     mk: [
-      { label: "Сите Производи", href: "/all-products" },
+      { label: "Колекција", href: "/all-products" },
       { label: "За Нас", href: "#about" },
       { label: "Капсули", href: "/capsules" },
       { label: "Контакт", href: "#contact" },

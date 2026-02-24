@@ -12,17 +12,17 @@ const AllProducts = () => {
       <section className="bg-[#9e0102] py-14 text-white md:py-20">
         <div className="mx-auto max-w-6xl px-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#ffd7d1]">Galla Espresso</p>
-          <h1 className="mt-2 font-serif text-4xl md:text-6xl">All Products</h1>
+          <h1 className="mt-2 font-serif text-4xl md:text-6xl">Galla Collection</h1>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-[#ffe8e4] md:text-base">
             Espresso is a wonderful blending of coffees Arabica and Robusta with controlled quality, using the
             Italian style during roasting of coffee, with our expertise and technique in the coffee industry. We
             cannot expect anything else but sweet espresso, aromatic and very delicious.
           </p>
           <Link
-            to="/"
+            to="/#about"
             className="mt-6 inline-flex items-center rounded-md border border-[#ffd0ca] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-85"
           >
-            Back To Home
+            Discover More
           </Link>
         </div>
       </section>
