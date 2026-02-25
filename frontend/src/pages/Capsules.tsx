@@ -13,7 +13,8 @@ import { placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 const capsuleProducts = [
   {
     id: "capsules-classic",
-    name: "Capsules Classic 10x",
+    name: "Capsules Classic",
+    subtitle: "Standard Pack",
     image: capsuleClassic10,
     description:
       "The quintessential Galla experience. A harmonious blend with a velvety crema and a smooth, lingering finish.",
@@ -27,12 +28,13 @@ const capsuleProducts = [
   },
   {
     id: "capsules-classic-50x",
-    name: "Capsules Classic 50x",
+    name: "Capsules Classic",
+    subtitle: "Value Pack",
     image: capsuleClassic50,
     description:
       "The same signature Classic profile in a larger box for high-volume use and longer stock at home or office.",
     price: 28.9,
-    netWeight: "50 capsules x 5 g (250 g)",
+    netWeight: "50 capsules x 5.5 g (275 g)",
     roast: "Medium",
     intensity: "7/10",
     format: "Box of 50 capsules",
@@ -304,7 +306,7 @@ const Capsules = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Inter',sans-serif] text-[#1f1f1f]">
+    <div className="min-h-screen bg-white font-['Helvetica_Neue','Roboto',sans-serif] text-[#1f1f1f]">
       <CompactHeader cartCount={totalCapsulePacks} cartHref="#order-summary" />
       <div className="pb-14 pt-20 md:pb-20 md:pt-24">
       <div className="mx-auto max-w-7xl px-4">
@@ -316,7 +318,7 @@ const Capsules = () => {
             &gt; <span className="text-[#9e0102]">Capsules</span>
           </p>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9e0102]">New Product Line</p>
-          <h1 className="mt-3 font-['Playfair_Display',serif] text-4xl md:text-5xl">The Art of Espresso, Encapsulated</h1>
+          <h1 className="mt-3 text-4xl font-medium tracking-tight md:text-5xl">The Art of Espresso, Encapsulated</h1>
           <p className="mt-4 text-base leading-8 text-[#3a3a3a] md:text-lg">
             Discover the exquisite Galla collection.
           </p>
@@ -333,7 +335,12 @@ const Capsules = () => {
                   hasCapsuleSelection ? "md:basis-[calc(50%-1rem)]" : "md:basis-[calc(50%-1rem)] xl:basis-[calc(33.333%-1.34rem)]"
                 }`}
               >
-                <div className="flex h-[250px] items-center justify-center p-3">
+                <div className="relative flex h-[250px] items-center justify-center p-3">
+                  {product.id === "capsules-classic-50x" && (
+                    <span className="absolute right-3 top-3 z-10 rounded-md bg-[#9e0102] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white shadow-md animate-pulse">
+                      50X
+                    </span>
+                  )}
                   <img
                     src={product.id === "capsules-classic-50x" ? capsuleClassic50Transparent : product.image}
                     alt={product.name}
@@ -343,7 +350,12 @@ const Capsules = () => {
 
                 <div className="mt-4 flex flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">
-                    <h2 className="font-['Playfair_Display',serif] text-2xl leading-tight">{product.name}</h2>
+                    <div>
+                      <h2 className="text-2xl font-medium leading-tight tracking-tight">{product.name}</h2>
+                      {product.subtitle && (
+                        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#6d6d6d]">{product.subtitle}</p>
+                      )}
+                    </div>
                     <p className="text-lg font-bold text-[#9e0102]">EUR {product.price.toFixed(2)}</p>
                   </div>
                   <p className="mt-2 min-h-[96px] text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
@@ -485,7 +497,7 @@ const Capsules = () => {
 
         <div className="mt-16 border-t border-[#dbcfc4] pt-12">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9e0102]">Espresso Products</p>
-          <h2 className="mt-2 font-['Playfair_Display',serif] text-3xl md:text-4xl">Also Available To Order</h2>
+          <h2 className="mt-2 text-3xl font-medium tracking-tight md:text-4xl">Also Available To Order</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[#4a4a4a] md:text-base">
             Classic, Aroma, Cream, and Black espresso are also available for purchase. Prices are not displayed yet.
             Contact us for order details.
@@ -497,7 +509,7 @@ const Capsules = () => {
                 <div className="rounded-xl bg-[#f7f3ee] p-4">
                   <img src={product.image} alt={product.name} className="mx-auto h-40 w-auto object-contain md:h-44" />
                 </div>
-                <h3 className="mt-4 font-['Playfair_Display',serif] text-2xl text-[#1f1f1f]">{product.name}</h3>
+                <h3 className="mt-4 text-2xl font-medium tracking-tight text-[#1f1f1f]">{product.name}</h3>
                 <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#9e0102]">Available For Order</p>
