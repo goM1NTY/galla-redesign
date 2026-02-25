@@ -1,10 +1,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
-import capsuleClassic10 from "@/assets/capsules_classic.png";
+import capsuleClassic10 from "@/assets/classicnew-white.png";
 import capsuleClassic50 from "@/assets/50x.jpeg";
-import capsuleAroma from "@/assets/red.webp";
-import capsuleBlack from "@/assets/black.jpeg";
+import capsuleAroma from "@/assets/aromanewnew-white.png";
 import classicCoffee from "@/assets/classic-coffee.png";
 import aromaCoffee from "@/assets/aroma-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
@@ -24,7 +23,7 @@ const capsuleProducts = [
     intensity: "7/10",
     format: "Box of 10 capsules",
     compatibility: "Nespresso Original compatible",
-    imageClassName: "mix-blend-multiply",
+    imageClassName: "",
   },
   {
     id: "capsules-classic-50x",
@@ -52,20 +51,7 @@ const capsuleProducts = [
     intensity: "8/10",
     format: "Box of 10 capsules",
     compatibility: "Nespresso Original compatible",
-    imageClassName: "mix-blend-multiply",
-  },
-  {
-    id: "capsules-black",
-    name: "Capsules Black",
-    image: capsuleBlack,
-    description: "Strong body and deeper roast character with long finish and bold espresso expression.",
-    price: 7.2,
-    netWeight: "10 capsules x 5 g (50 g)",
-    roast: "Dark",
-    intensity: "10/10",
-    format: "Box of 10 capsules",
-    compatibility: "Nespresso Original compatible",
-    imageClassName: "mix-blend-multiply",
+    imageClassName: "",
   },
 ];
 
@@ -351,7 +337,7 @@ const Capsules = () => {
                   <img
                     src={product.id === "capsules-classic-50x" ? capsuleClassic50Transparent : product.image}
                     alt={product.name}
-                    className={`mx-auto h-[220px] w-full object-contain ${product.imageClassName ?? ""}`}
+                    className={`mx-auto h-[220px] w-auto object-contain ${product.imageClassName ?? ""}`}
                   />
                 </div>
 
