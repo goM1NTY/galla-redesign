@@ -13,6 +13,7 @@ import capsulesClassic from "@/assets/capsules_classic_cropped.png";
 import aromaCapsules from "@/assets/aromacaps-cropped.png";
 
 type Language = "en" | "sq" | "mk";
+const LANGUAGE_STORAGE_KEY = "galla_lang";
 
 const translations = {
   en: {
@@ -174,7 +175,11 @@ const translations = {
 } as const;
 
 const Index = () => {
-  const [lang, setLang] = useState<Language>("en");
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window === "undefined") return "en";
+    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return saved === "sq" || saved === "mk" ? saved : "en";
+  });
   const t = translations[lang];
   const [productsCarouselApi, setProductsCarouselApi] = useState<CarouselApi>();
   const [activeProductIndex, setActiveProductIndex] = useState(0);
@@ -226,6 +231,13 @@ const Index = () => {
       window.clearTimeout(timerId);
     };
   }, []);
+
+  const handleLangChange = (nextLang: Language) => {
+    setLang(nextLang);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLang);
+    }
+  };
 
   const products = [
     {
@@ -285,7 +297,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header lang={lang} onLangChange={setLang} />
+      <Header lang={lang} onLangChange={handleLangChange} />
       {showCapsulesPopup && (
         <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/45 px-4 backdrop-blur-[8px]">
           <div className="relative w-full max-w-4xl rounded-2xl border border-[#e2d4c7] bg-white p-5 shadow-2xl md:p-6">
