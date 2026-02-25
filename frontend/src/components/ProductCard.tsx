@@ -10,12 +10,12 @@ interface ProductCardProps {
 const ProductCard = ({ image, name, imageClassName, overlay }: ProductCardProps) => {
   return (
     <article className="mx-auto flex w-full max-w-[320px] flex-col items-center">
-      <div className="relative h-[290px] w-[210px] overflow-visible md:h-[320px] md:w-[230px]">
+      <div className="relative flex h-[250px] w-full items-end justify-center overflow-visible">
         {overlay && <div className="absolute right-1 top-12 z-10 md:right-2 md:top-14">{overlay}</div>}
         <img
           src={image}
           alt={name}
-          className={`h-full w-full origin-bottom object-contain ${imageClassName || ""}`}
+          className={`h-full w-auto self-end origin-bottom object-contain ${imageClassName || ""}`}
           loading="lazy"
         />
       </div>

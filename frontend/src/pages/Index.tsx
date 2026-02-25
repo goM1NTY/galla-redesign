@@ -9,8 +9,8 @@ import blackCoffee from "@/assets/black-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import espressoPhoto from "@/assets/5.jpeg";
 import capsulesPhoto from "@/assets/capsules.png";
-import capsulesClassic from "@/assets/capsules_classic.png";
-import capsulesAromaCustom from "@/assets/red.webp";
+import capsulesClassic from "@/assets/capsules_classic_cropped.png";
+import aromaCapsules from "@/assets/aromacaps-cropped.png";
 
 type Language = "en" | "sq" | "mk";
 
@@ -232,13 +232,13 @@ const Index = () => {
       id: 5,
       name: "GALLA CLASSIC - CAPSULES",
       image: capsulesClassic,
-      imageClassName: "scale-105 md:scale-110 brightness-110 contrast-110",
+      imageClassName: "h-[210px] brightness-110 contrast-110",
     },
     {
       id: 6,
       name: "GALLA AROMA - CAPSULES",
-      image: capsulesAromaCustom,
-      imageClassName: "scale-105 md:scale-110 brightness-110 contrast-110",
+      image: aromaCapsules,
+      imageClassName: "h-[210px] brightness-110 contrast-110",
     },
     {
       id: 1,
@@ -259,7 +259,6 @@ const Index = () => {
       id: 4,
       name: "GALLA BLACK PREMIUM",
       image: blackCoffee,
-      imageClassName: "scale-42 md:scale-52",
     },
   ];
 
@@ -353,7 +352,7 @@ const Index = () => {
                         index === activeProductIndex ? "scale-104 md:scale-108" : "scale-97 md:scale-100"
                       }`}
                       overlay={
-                        product.id === 5 ? (
+                        product.id === 5 || product.id === 6 ? (
                           <a
                             href="/capsules"
                             className="inline-flex items-center rounded-bl-md rounded-tr-md bg-[#9e0102] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-white shadow-lg ring-1 ring-white/30 animate-pulse transition-opacity hover:opacity-90 md:text-xs"
