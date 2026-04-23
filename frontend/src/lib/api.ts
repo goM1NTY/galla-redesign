@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://galla-redesign-production.up.railway.app";
 
 interface ApiResponse<T> {
   success: boolean;
