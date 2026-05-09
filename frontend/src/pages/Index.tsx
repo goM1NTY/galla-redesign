@@ -91,7 +91,7 @@ const translations = {
     message: "Your Message",
     send: "Send",
     footerTag: "Crafted coffee blends and capsules with Italian roasting character since 2005.",
-    quickLinks: "Quick Links",
+    quickLinks: "Menu",
     products: "Products",
     contact: "Contact",
     rights: "All rights reserved.",
@@ -132,7 +132,7 @@ const translations = {
     mission: "Misioni", missionText: "Misioni ynë është të përmbushim nevojat, shijet dhe dëshirat e konsumatorëve përmes cilësisë, stafit me përvojë, teknologjisë moderne dhe inovacionit të vazhdueshëm.",
     vision: "Vizioni", visionText: "Vizioni ynë është që Galla Kaffe të bëhet markë e njohur në vend dhe në Evropë duke ofruar cilësi dhe vlerë.",
     contactUs: "Na Kontaktoni", infoAddress: "Informacion & Adresë", kosovo: "Kosovë", nameRequired: "Emri Juaj (i detyrueshëm)", emailRequired: "Email-i Juaj (i detyrueshëm)", subject: "Subjekti", message: "Mesazhi Juaj", send: "Dërgo",
-    footerTag: "Përzierje kafeje dhe kapsula me karakter italian pjekjeje që nga viti 2005.", quickLinks: "Lidhje të Shpejta", products: "Produktet", contact: "Kontakt", rights: "Të gjitha të drejtat e rezervuara.",
+    footerTag: "Përzierje kafeje dhe kapsula me karakter italian pjekjeje që nga viti 2005.", quickLinks: "Menyja", products: "Produktet", contact: "Kontakt", rights: "Të gjitha të drejtat e rezervuara.",
   },
   mk: {
     espressoLabel: "Galla Espresso", espressoTitle: "Италијанско Печење, Балансиран Карактер",
@@ -170,7 +170,7 @@ const translations = {
     mission: "Мисија", missionText: "Нашата мисија е да ги задоволиме потребите, вкусовите и желбите на потрошувачите преку квалитет, искусен кадар, модерна технологија и постојана иновација.",
     vision: "Визија", visionText: "Визијата е Galla Kaffe да стане препознатлив бренд во земјата и Европа со квалитет и вредност.",
     contactUs: "Контакт", infoAddress: "Информации и Адреса", kosovo: "Косово", nameRequired: "Ваше Име (задолжително)", emailRequired: "Ваш Email (задолжително)", subject: "Наслов", message: "Вашата Порака", send: "Испрати",
-    footerTag: "Кафе мешавини и капсули со италијански карактер на печење од 2005.", quickLinks: "Брзи Линкови", products: "Производи", contact: "Контакт", rights: "Сите права се задржани.",
+    footerTag: "Кафе мешавини и капсули со италијански карактер на печење од 2005.", quickLinks: "Мени", products: "Производи", contact: "Контакт", rights: "Сите права се задржани.",
   },
 } as const;
 
@@ -652,17 +652,17 @@ const Index = () => {
       </section>
 
       <footer className="bg-[#9e0102] py-10 text-[#ffe6e2]">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 md:grid-cols-3">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-4 md:grid-cols-3 md:gap-10 lg:gap-12">
           <div>
-            <h3 className="font-serif text-3xl">Galla Espresso</h3>
-            <p className="mt-2 text-sm leading-7 text-[#ffd7d1]">
+            <h3 className="font-serif text-3xl leading-none">Galla Espresso</h3>
+            <p className="mt-4 max-w-sm text-sm leading-7 text-[#ffd7d1]">
               {t.footerTag}
             </p>
           </div>
 
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white">{t.quickLinks}</p>
-            <div className="mt-3 space-y-2 text-sm">
+          <div className="md:pl-8 lg:pl-12">
+            <p className="text-sm font-semibold uppercase leading-none tracking-[0.16em] text-white">{t.quickLinks}</p>
+            <div className="mt-4 space-y-2 text-sm leading-6 text-[#ffd7d1]">
               <p><a href="#products" className="hover:underline">{t.products}</a></p>
               <p><a href="#espresso" className="hover:underline">{t.espressoLabel}</a></p>
               <p><a href="/capsules" className="hover:underline">{t.capsulesTitle}</a></p>
@@ -672,8 +672,8 @@ const Index = () => {
           </div>
 
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white">{t.contact}</p>
-            <div className="mt-3 space-y-1 text-sm text-[#ffd7d1]">
+            <p className="text-sm font-semibold uppercase leading-none tracking-[0.16em] text-white">{t.contact}</p>
+            <div className="mt-4 space-y-2 text-sm leading-6 text-[#ffd7d1]">
               <p>Ilindenska 160, Tetovo, Macedonia</p>
               <p>+389 44 333 375</p>
               <p>+389 71 224 557</p>
