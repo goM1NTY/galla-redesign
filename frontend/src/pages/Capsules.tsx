@@ -117,7 +117,13 @@ const capsuleTranslations = {
     emptyCart: "Empty Cart",
     yourName: "Your name",
     yourEmail: "Your email",
-    phoneOptional: "Phone (optional)",
+    phone: "Phone number",
+    deliveryAddress: "Street and delivery address",
+    city: "City",
+    postalCodeOptional: "Postal code (optional)",
+    paymentMethod: "Payment method",
+    cashOnDelivery: "Cash on delivery",
+    cashOnDeliveryHelp: "Pay the courier in cash when your order arrives.",
     orderNoteOptional: "Order note (optional)",
     noProducts: "No products selected yet.",
     subtotal: "Subtotal",
@@ -126,7 +132,7 @@ const capsuleTranslations = {
     free: "Free",
     submitting: "Submitting...",
     placeOrder: "Place Order",
-    orderSuccess: "Order request sent successfully.",
+    orderSuccess: "Order placed successfully. Payment is due in cash on delivery.",
     orderFailed: "Failed to send order.",
     freeShippingNote: "Free shipping above EUR 35. Orders are prepared within 24 hours.",
     ordersSubmittedApi: "Orders are submitted directly to the backend API.",
@@ -165,7 +171,13 @@ const capsuleTranslations = {
     emptyCart: "Zbraz Shportën",
     yourName: "Emri juaj",
     yourEmail: "Email-i juaj",
-    phoneOptional: "Telefoni (opsional)",
+    phone: "Numri i telefonit",
+    deliveryAddress: "Rruga dhe adresa e dorëzimit",
+    city: "Qyteti",
+    postalCodeOptional: "Kodi postar (opsional)",
+    paymentMethod: "Mënyra e pagesës",
+    cashOnDelivery: "Pagesë me para në dorëzim",
+    cashOnDeliveryHelp: "Paguani korrierin me para kur të mbërrijë porosia.",
     orderNoteOptional: "Shënim porosie (opsional)",
     noProducts: "Ende nuk ka produkte të zgjedhura.",
     subtotal: "Nëntotali",
@@ -174,7 +186,7 @@ const capsuleTranslations = {
     free: "Falas",
     submitting: "Duke dërguar...",
     placeOrder: "Bëj Porosinë",
-    orderSuccess: "Kërkesa e porosisë u dërgua me sukses.",
+    orderSuccess: "Porosia u bë me sukses. Pagesa bëhet me para në dorëzim.",
     orderFailed: "Dërgimi i porosisë dështoi.",
     freeShippingNote: "Transport falas mbi EUR 35. Porositë përgatiten brenda 24 orëve.",
     ordersSubmittedApi: "Porositë dërgohen direkt në backend API.",
@@ -213,7 +225,13 @@ const capsuleTranslations = {
     emptyCart: "Испразни Кошничка",
     yourName: "Ваше име",
     yourEmail: "Ваш email",
-    phoneOptional: "Телефон (опционално)",
+    phone: "Телефонски број",
+    deliveryAddress: "Улица и адреса за достава",
+    city: "Град",
+    postalCodeOptional: "Поштенски број (опционално)",
+    paymentMethod: "Начин на плаќање",
+    cashOnDelivery: "Плаќање во готово при достава",
+    cashOnDeliveryHelp: "Платете му во готово на курирот кога ќе пристигне нарачката.",
     orderNoteOptional: "Белешка за нарачка (опционално)",
     noProducts: "Сè уште нема избрани производи.",
     subtotal: "Меѓузбир",
@@ -222,7 +240,7 @@ const capsuleTranslations = {
     free: "Бесплатно",
     submitting: "Се испраќа...",
     placeOrder: "Нарачај",
-    orderSuccess: "Барањето за нарачка е успешно испратено.",
+    orderSuccess: "Нарачката е успешно направена. Плаќањето е во готово при достава.",
     orderFailed: "Неуспешно испраќање на нарачка.",
     freeShippingNote: "Бесплатна достава над EUR 35. Нарачките се подготвуваат за 24 часа.",
     ordersSubmittedApi: "Нарачките се испраќаат директно до backend API.",
@@ -283,6 +301,9 @@ const Capsules = () => {
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    deliveryAddress: "",
+    city: "",
+    postalCode: "",
     note: "",
   });
   const [orderSubmitState, setOrderSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -416,7 +437,11 @@ const Capsules = () => {
       await placeCapsuleOrder({
         customerName: orderForm.customerName,
         customerEmail: orderForm.customerEmail,
-        customerPhone: orderForm.customerPhone || undefined,
+        customerPhone: orderForm.customerPhone,
+        deliveryAddress: orderForm.deliveryAddress,
+        city: orderForm.city,
+        postalCode: orderForm.postalCode || undefined,
+        paymentMethod: "CASH_ON_DELIVERY",
         note: orderForm.note || undefined,
         items: selectedCapsules.map((product) => ({
           productId: product.id,
@@ -427,7 +452,15 @@ const Capsules = () => {
       setOrderSubmitState("success");
       setOrderSubmitMessage(t.orderSuccess);
       setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
-      setOrderForm({ customerName: "", customerEmail: "", customerPhone: "", note: "" });
+      setOrderForm({
+        customerName: "",
+        customerEmail: "",
+        customerPhone: "",
+        deliveryAddress: "",
+        city: "",
+        postalCode: "",
+        note: "",
+      });
     } catch (error) {
       setOrderSubmitState("error");
       setOrderSubmitMessage(error instanceof Error ? error.message : t.orderFailed);
@@ -593,12 +626,41 @@ const Capsules = () => {
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
               <input
-                type="text"
+                type="tel"
                 value={orderForm.customerPhone}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
-                placeholder={t.phoneOptional}
+                placeholder={t.phone}
+                required
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
+              <input
+                type="text"
+                value={orderForm.deliveryAddress}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, deliveryAddress: event.target.value }))}
+                placeholder={t.deliveryAddress}
+                autoComplete="street-address"
+                required
+                className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={orderForm.city}
+                  onChange={(event) => setOrderForm((prev) => ({ ...prev, city: event.target.value }))}
+                  placeholder={t.city}
+                  autoComplete="address-level2"
+                  required
+                  className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
+                />
+                <input
+                  type="text"
+                  value={orderForm.postalCode}
+                  onChange={(event) => setOrderForm((prev) => ({ ...prev, postalCode: event.target.value }))}
+                  placeholder={t.postalCodeOptional}
+                  autoComplete="postal-code"
+                  className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
+                />
+              </div>
               <textarea
                 value={orderForm.note}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, note: event.target.value }))}
@@ -607,6 +669,19 @@ const Capsules = () => {
                 className="w-full resize-y rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
             </div>
+
+            <fieldset className="mt-4">
+              <legend className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6d6259]">
+                {t.paymentMethod}
+              </legend>
+              <label className="mt-2 flex cursor-pointer gap-3 rounded-[6px] border border-[#9e0102] bg-[#fff8f6] p-3">
+                <input type="radio" name="paymentMethod" value="CASH_ON_DELIVERY" checked readOnly className="mt-1 accent-[#9e0102]" />
+                <span>
+                  <span className="block text-sm font-semibold text-[#1f1f1f]">{t.cashOnDelivery}</span>
+                  <span className="mt-0.5 block text-xs leading-5 text-[#6d6259]">{t.cashOnDeliveryHelp}</span>
+                </span>
+              </label>
+            </fieldset>
 
             <div className="mt-4 space-y-2 border-b border-[#e8ddd2] pb-4 text-sm text-[#383838]">
               {selectedCapsules.length === 0 ? (
@@ -640,7 +715,13 @@ const Capsules = () => {
               type="button"
               onClick={handleCapsuleOrderSubmit}
               disabled={
-                orderSubmitState === "loading" || !orderForm.customerName || !orderForm.customerEmail || !hasCapsuleSelection
+                orderSubmitState === "loading" ||
+                !orderForm.customerName.trim() ||
+                !orderForm.customerEmail.trim() ||
+                !orderForm.customerPhone.trim() ||
+                !orderForm.deliveryAddress.trim() ||
+                !orderForm.city.trim() ||
+                !hasCapsuleSelection
               }
               className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-[#8B1A1A] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors duration-200 hover:bg-[#741313]"
             >

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ProductCategory } from "@prisma/client";
+import { PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import {
@@ -10,7 +10,11 @@ import {
 const capsuleOrderSchema = z.object({
   customerName: z.string().trim().min(2),
   customerEmail: z.string().trim().email(),
-  customerPhone: z.string().trim().min(6).max(40).optional(),
+  customerPhone: z.string().trim().min(6).max(40),
+  deliveryAddress: z.string().trim().min(5).max(200),
+  city: z.string().trim().min(2).max(100),
+  postalCode: z.string().trim().max(20).optional(),
+  paymentMethod: z.literal("CASH_ON_DELIVERY"),
   note: z.string().trim().max(500).optional(),
   items: z
     .array(
@@ -61,6 +65,11 @@ ordersRouter.post("/capsules", async (req, res) => {
       customerName: parsed.data.customerName,
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
+      deliveryAddress: parsed.data.deliveryAddress,
+      city: parsed.data.city,
+      postalCode: parsed.data.postalCode,
+      paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
+      paymentStatus: PaymentStatus.PENDING,
       note: parsed.data.note,
       items: {
         create: parsed.data.items.map((item) => ({
@@ -76,7 +85,12 @@ ordersRouter.post("/capsules", async (req, res) => {
       id: order.id,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
-      customerPhone: order.customerPhone ?? undefined,
+      customerPhone: order.customerPhone!,
+      deliveryAddress: order.deliveryAddress!,
+      city: order.city!,
+      postalCode: order.postalCode ?? undefined,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
       note: order.note ?? undefined,
       items: parsed.data.items,
       createdAt: order.createdAt.toISOString(),
@@ -91,6 +105,11 @@ ordersRouter.post("/capsules", async (req, res) => {
     customerName: order.customerName,
     customerEmail: order.customerEmail,
     customerPhone: order.customerPhone,
+    deliveryAddress: order.deliveryAddress,
+    city: order.city,
+    postalCode: order.postalCode,
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
     note: order.note,
     items: parsed.data.items,
     createdAt: order.createdAt,

@@ -39,7 +39,11 @@ export function sendContact(payload: {
 export function placeCapsuleOrder(payload: {
   customerName: string;
   customerEmail: string;
-  customerPhone?: string;
+  customerPhone: string;
+  deliveryAddress: string;
+  city: string;
+  postalCode?: string;
+  paymentMethod: "CASH_ON_DELIVERY";
   note?: string;
   items: Array<{ productId: string; quantity: number }>;
 }) {

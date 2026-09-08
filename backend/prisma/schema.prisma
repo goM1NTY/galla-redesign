@@ -39,6 +39,11 @@ model Order {
   customerName  String
   customerEmail String
   customerPhone String?
+  deliveryAddress String?
+  city            String?
+  postalCode      String?
+  paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)
+  paymentStatus   PaymentStatus @default(PENDING)
   note          String?
   createdAt     DateTime    @default(now())
   items         OrderItem[]
@@ -82,4 +87,16 @@ model EspressoInquiryProduct {
 enum ProductCategory {
   capsules
   espresso
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
 }

@@ -27,7 +27,12 @@ export interface CapsuleOrder {
   id: string;
   customerName: string;
   customerEmail: string;
-  customerPhone?: string;
+  customerPhone: string;
+  deliveryAddress: string;
+  city: string;
+  postalCode?: string;
+  paymentMethod: "CASH_ON_DELIVERY" | "CARD";
+  paymentStatus: "PENDING" | "PAID" | "FAILED" | "CANCELLED";
   items: CapsuleOrderItem[];
   note?: string;
   createdAt: string;
