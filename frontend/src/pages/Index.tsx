@@ -681,8 +681,15 @@ const Index = () => {
             </div>
           </div>
         </div>
-        <div className="mx-auto mt-8 max-w-7xl border-t border-[#b95a58] px-4 pt-4 text-xs text-[#ffd7d1]">
-          © {new Date().getFullYear()} Galla Caffe. {t.rights}
+        <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-3 border-t border-[#b95a58] px-4 pt-4 text-xs text-[#ffd7d1] md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Galla Caffe. {t.rights}</p>
+          <nav aria-label="Store policies" className="flex flex-wrap gap-x-4 gap-y-2">
+            <a href="/privacy" className="hover:underline">Privacy</a>
+            <a href="/terms" className="hover:underline">Terms</a>
+            <a href="/shipping" className="hover:underline">Shipping</a>
+            <a href="/returns" className="hover:underline">Returns</a>
+            <a href="/company-details" className="hover:underline">Company Details</a>
+          </nav>
         </div>
       </footer>
     </div>

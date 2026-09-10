@@ -8,10 +8,10 @@
 
 4. [x] **Add order confirmation.** Checkout now shows a persistent order number and total, and the customer receives an email with their items, total, delivery address, payment method, and order status.
 
-5. [ ] **Add order management.** Create a protected admin view where Galla can see orders and update them to `CONFIRMED`, `SHIPPED`, `DELIVERED`, or `CANCELLED`.
+5. [x] **Add order management.** A simple admin-key-protected view lists recent orders and updates them through `NEW`, `CONFIRMED`, `SHIPPED`, `DELIVERED`, or `CANCELLED`. The same API can later connect to GC Core.
 
 6. [x] **Define delivery rules.** Deliver across North Macedonia in 3–5 business days; delivery is 120 MKD and free above 2,150 MKD. Show EUR and MKD prices, with cash collected in MKD by the courier.
 
-7. [ ] **Add required store pages.** Publish Privacy Policy, Terms and Conditions, Shipping Policy, Returns/Refund Policy, and company/legal details; link them in the footer and checkout.
+7. [x] **Add required store pages.** Privacy, Terms, Shipping, Returns/Refunds and Company Details pages are published and linked from the footer and checkout. Registered company and tax details still require business confirmation.
 
 8. [ ] **Finish production checks.** Test cash and card orders on mobile and desktop, add the missing favicon, fix the homepage address spacing (`Ilindenska 160, Tetovo`), verify all contact details, and remove the React Router warnings during the next dependency update.

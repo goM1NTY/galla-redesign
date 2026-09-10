@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import AllProducts from "./pages/AllProducts";
 import Capsules from "./pages/Capsules";
 import NotFound from "./pages/NotFound";
+import StorePolicy from "./pages/StorePolicy";
+import AdminOrders from "./pages/AdminOrders";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/all-products" element={<AllProducts />} />
           <Route path="/capsules" element={<Capsules />} />
+          <Route path="/privacy" element={<StorePolicy type="privacy" />} />
+          <Route path="/terms" element={<StorePolicy type="terms" />} />
+          <Route path="/shipping" element={<StorePolicy type="shipping" />} />
+          <Route path="/returns" element={<StorePolicy type="returns" />} />
+          <Route path="/company-details" element={<StorePolicy type="company" />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

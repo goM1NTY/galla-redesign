@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
+import StoreFooter from "@/components/StoreFooter";
 import classicCoffee from "@/assets/classic-coffee.png";
 import aromaCoffee from "@/assets/aroma-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
@@ -98,6 +99,7 @@ const AllProducts = () => {
           </article>
         </div>
       </section>
+      <StoreFooter />
     </div>
   );
 };

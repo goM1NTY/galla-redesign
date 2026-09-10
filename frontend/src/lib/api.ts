@@ -15,13 +15,41 @@ interface CapsuleOrderResponse {
   eurToMkdRate: number;
 }
 
+export type FulfillmentStatus = "NEW" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+
+export interface AdminOrder {
+  id: string;
+  orderNumber: string | null;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  deliveryAddress: string | null;
+  city: string | null;
+  postalCode: string | null;
+  deliveryCountry: string;
+  paymentMethod: "CASH_ON_DELIVERY" | "CARD";
+  paymentStatus: "PENDING" | "PAID" | "FAILED" | "CANCELLED";
+  fulfillmentStatus: FulfillmentStatus;
+  totalCents: number | null;
+  currency: string;
+  note: string | null;
+  createdAt: string;
+  items: Array<{
+    id: string;
+    quantity: number;
+    unitPriceCents: number | null;
+    lineTotalCents: number | null;
+    product: { code: string; name: string };
+  }>;
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<ApiResponse<T>> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
     headers: {
       "Content-Type": "application/json",
       ...(init.headers || {}),
     },
-    ...init,
   });
 
   const json = (await response.json()) as ApiResponse<T>;
@@ -71,5 +99,20 @@ export function sendEspressoInquiry(payload: {
   return request("/orders/espresso-inquiry", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export function getAdminOrders(adminKey: string) {
+  return request<AdminOrder[]>("/orders/admin", {
+    method: "GET",
+    headers: { "x-admin-key": adminKey },
+  });
+}
+
+export function updateAdminOrderStatus(adminKey: string, orderId: string, status: FulfillmentStatus) {
+  return request<AdminOrder>(`/orders/admin/${orderId}/status`, {
+    method: "PATCH",
+    headers: { "x-admin-key": adminKey },
+    body: JSON.stringify({ status }),
   });
 }

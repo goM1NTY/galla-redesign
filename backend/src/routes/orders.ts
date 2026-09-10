@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { randomBytes } from "node:crypto";
-import { PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
+import { randomBytes, timingSafeEqual } from "node:crypto";
+import { FulfillmentStatus, PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
+import type { RequestHandler } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import {
@@ -43,6 +44,62 @@ const EUR_TO_MKD_RATE =
   Number.isFinite(configuredEurToMkdRate) && configuredEurToMkdRate > 0 ? configuredEurToMkdRate : 61.5;
 const SHIPPING_MKD_CENTS = 12_000;
 const FREE_SHIPPING_MKD_CENTS = 215_000;
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
+
+const requireAdmin: RequestHandler = (req, res, next) => {
+  if (!ADMIN_API_KEY) {
+    return res.status(503).json({ success: false, error: "Admin access is not configured" });
+  }
+
+  const suppliedKey = req.header("x-admin-key") || "";
+  const expected = Buffer.from(ADMIN_API_KEY);
+  const supplied = Buffer.from(suppliedKey);
+  if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+    return res.status(401).json({ success: false, error: "Invalid admin access key" });
+  }
+
+  next();
+};
+
+const fulfillmentStatusSchema = z.object({
+  status: z.nativeEnum(FulfillmentStatus),
+});
+
+ordersRouter.get("/admin", requireAdmin, async (_req, res) => {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 100,
+    include: {
+      items: {
+        include: {
+          product: { select: { code: true, name: true } },
+        },
+      },
+    },
+  });
+
+  return res.json({ success: true, data: orders });
+});
+
+ordersRouter.patch("/admin/:orderId/status", requireAdmin, async (req, res) => {
+  const parsed = fulfillmentStatusSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ success: false, error: "Invalid order status" });
+  }
+
+  try {
+    const order = await prisma.order.update({
+      where: { id: req.params.orderId },
+      data: { fulfillmentStatus: parsed.data.status },
+    });
+    return res.json({ success: true, data: order });
+  } catch (error) {
+    if (typeof error === "object" && error && "code" in error && error.code === "P2025") {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+    throw error;
+  }
+});
 
 ordersRouter.post("/capsules", async (req, res) => {
   const parsed = capsuleOrderSchema.safeParse(req.body);

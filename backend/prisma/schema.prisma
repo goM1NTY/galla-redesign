@@ -46,6 +46,7 @@ model Order {
   deliveryCountry String        @default("North Macedonia")
   paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)
   paymentStatus   PaymentStatus @default(PENDING)
+  fulfillmentStatus FulfillmentStatus @default(NEW)
   subtotalCents   Int?
   shippingCents   Int?
   totalCents      Int?
@@ -107,5 +108,13 @@ enum PaymentStatus {
   PENDING
   PAID
   FAILED
+  CANCELLED
+}
+
+enum FulfillmentStatus {
+  NEW
+  CONFIRMED
+  SHIPPED
+  DELIVERED
   CANCELLED
 }

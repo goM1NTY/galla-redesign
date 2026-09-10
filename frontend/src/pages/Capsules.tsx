@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
+import StoreFooter from "@/components/StoreFooter";
 import capsuleClassic10 from "@/assets/classicnew-white.png";
 import capsuleClassic50 from "@/assets/50x.jpeg";
 import capsuleAroma from "@/assets/aromanewnew-white.png";
@@ -141,6 +142,7 @@ const capsuleTranslations = {
     confirmationTitle: "Order Confirmed",
     orderNumber: "Order number",
     confirmationEmail: "A confirmation email was sent to",
+    acceptPolicies: "I have read and agree to:",
     orderFailed: "Failed to send order.",
     freeShippingNote: "Delivery across North Macedonia in 3–5 business days. Delivery is 120 MKD and free above 2,150 MKD.",
     ordersSubmittedApi: "Orders are submitted directly to the backend API.",
@@ -198,6 +200,7 @@ const capsuleTranslations = {
     confirmationTitle: "Porosia u Konfirmua",
     orderNumber: "Numri i porosisë",
     confirmationEmail: "Një email konfirmimi u dërgua te",
+    acceptPolicies: "I kam lexuar dhe i pranoj:",
     orderFailed: "Dërgimi i porosisë dështoi.",
     freeShippingNote: "Dorëzim në gjithë Maqedoninë e Veriut brenda 3–5 ditëve pune. Transporti kushton 120 MKD dhe është falas mbi 2.150 MKD.",
     ordersSubmittedApi: "Porositë dërgohen direkt në backend API.",
@@ -255,6 +258,7 @@ const capsuleTranslations = {
     confirmationTitle: "Нарачката е Потврдена",
     orderNumber: "Број на нарачка",
     confirmationEmail: "Е-пошта за потврда е испратена до",
+    acceptPolicies: "Ги прочитав и ги прифаќам:",
     orderFailed: "Неуспешно испраќање на нарачка.",
     freeShippingNote: "Испорака низ Северна Македонија за 3–5 работни дена. Доставата е 120 денари и е бесплатна над 2.150 денари.",
     ordersSubmittedApi: "Нарачките се испраќаат директно до backend API.",
@@ -325,6 +329,7 @@ const Capsules = () => {
   });
   const [orderSubmitState, setOrderSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [orderSubmitMessage, setOrderSubmitMessage] = useState("");
+  const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<{
     orderNumber: string;
     customerEmail: string;
@@ -491,6 +496,7 @@ const Capsules = () => {
         postalCode: "",
         note: "",
       });
+      setAcceptedPolicies(false);
     } catch (error) {
       setOrderSubmitState("error");
       setOrderSubmitMessage(error instanceof Error ? error.message : t.orderFailed);
@@ -762,6 +768,21 @@ const Capsules = () => {
               </div>
             </div>
 
+            <label className="mt-4 flex items-start gap-2 text-xs leading-5 text-[#554b43]">
+              <input
+                type="checkbox"
+                checked={acceptedPolicies}
+                onChange={(event) => setAcceptedPolicies(event.target.checked)}
+                className="mt-1 accent-[#9e0102]"
+              />
+              <span>
+                {t.acceptPolicies}{" "}
+                <Link to="/terms" target="_blank" rel="noreferrer" className="font-semibold text-[#9e0102] underline">Terms</Link>
+                {" · "}
+                <Link to="/privacy" target="_blank" rel="noreferrer" className="font-semibold text-[#9e0102] underline">Privacy</Link>
+              </span>
+            </label>
+
             <button
               type="button"
               onClick={handleCapsuleOrderSubmit}
@@ -772,6 +793,7 @@ const Capsules = () => {
                 !orderForm.customerPhone.trim() ||
                 !orderForm.deliveryAddress.trim() ||
                 !orderForm.city.trim() ||
+                !acceptedPolicies ||
                 !hasCapsuleSelection
               }
               className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-[#8B1A1A] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors duration-200 hover:bg-[#741313]"
@@ -894,6 +916,7 @@ const Capsules = () => {
         </div>
       </div>
       </div>
+      <StoreFooter />
     </div>
   );
 };
