@@ -9,7 +9,7 @@ import classicCoffee from "@/assets/classic-coffee.png";
 import aromaCoffee from "@/assets/aroma-coffee.png";
 import creamCoffee from "@/assets/cream-coffee.png";
 import blackCoffee from "@/assets/black-coffee.png";
-import { placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
+import { getProducts, placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 
 type Language = "en" | "sq" | "mk";
 const LANGUAGE_STORAGE_KEY = "galla_lang";
@@ -116,6 +116,8 @@ const capsuleTranslations = {
     format: "Format",
     compatibility: "Compatibility",
     inStock: "In stock",
+    outOfStock: "Out of stock",
+    leftInStock: "left",
     dispatch24: "Delivery in 3–5 business days",
     vatIncluded: "VAT included",
     orderSummary: "Order Summary",
@@ -174,6 +176,8 @@ const capsuleTranslations = {
     format: "Formati",
     compatibility: "Përputhshmëria",
     inStock: "Në stok",
+    outOfStock: "Nuk ka stok",
+    leftInStock: "të mbetura",
     dispatch24: "Dorëzim brenda 3–5 ditëve pune",
     vatIncluded: "TVSH e përfshirë",
     orderSummary: "Përmbledhja e Porosisë",
@@ -232,6 +236,8 @@ const capsuleTranslations = {
     format: "Формат",
     compatibility: "Компатибилност",
     inStock: "На залиха",
+    outOfStock: "Нема на залиха",
+    leftInStock: "преостанати",
     dispatch24: "Испорака за 3–5 работни дена",
     vatIncluded: "ДДВ вклучен",
     orderSummary: "Резиме на Нарачка",
@@ -304,6 +310,9 @@ const Capsules = () => {
       return { ...INITIAL_CAPSULE_QTY };
     }
   });
+  const [productAvailability, setProductAvailability] = useState<Record<string, { inStock: boolean; stockQuantity: number | null }>>(
+    Object.fromEntries(capsuleProducts.map((product) => [product.id, { inStock: true, stockQuantity: null }])),
+  );
 
   const selectedCapsules = useMemo(
     () => capsuleProducts.filter((product) => capsuleQty[product.id] > 0),
@@ -350,6 +359,22 @@ const Capsules = () => {
   useEffect(() => {
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(capsuleQty));
   }, [capsuleQty]);
+
+  useEffect(() => {
+    getProducts()
+      .then((result) => {
+        if (!result.data) return;
+        setProductAvailability((current) => ({
+          ...current,
+          ...Object.fromEntries(
+            result.data
+              .filter((product) => product.id.startsWith("capsules-"))
+              .map((product) => [product.id, { inStock: product.inStock, stockQuantity: product.stockQuantity }]),
+          ),
+        }));
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
@@ -446,8 +471,13 @@ const Capsules = () => {
   }, []);
 
   const increaseCapsule = (id: string) => {
+    const availability = productAvailability[id];
+    if (!availability?.inStock) return;
     setConfirmedOrder(null);
-    setCapsuleQty((prev) => ({ ...prev, [id]: prev[id] + 1 }));
+    setCapsuleQty((prev) => ({
+      ...prev,
+      [id]: availability.stockQuantity === null ? prev[id] + 1 : Math.min(prev[id] + 1, availability.stockQuantity),
+    }));
   };
 
   const decreaseCapsule = (id: string) => {
@@ -622,7 +652,12 @@ const Capsules = () => {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between text-xs">
-                    <p className="font-semibold text-green-700">{t.inStock}</p>
+                    <p className={`font-semibold ${productAvailability[product.id]?.inStock ? "text-green-700" : "text-red-700"}`}>
+                      {productAvailability[product.id]?.inStock ? t.inStock : t.outOfStock}
+                      {productAvailability[product.id]?.stockQuantity !== null && productAvailability[product.id]?.stockQuantity !== undefined
+                        ? ` · ${productAvailability[product.id].stockQuantity} ${t.leftInStock}`
+                        : ""}
+                    </p>
                     <p className="text-[#5a5a5a]">{t.dispatch24}</p>
                   </div>
 
@@ -639,7 +674,12 @@ const Capsules = () => {
                       <button
                         type="button"
                         onClick={() => increaseCapsule(product.id)}
-                        className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
+                        disabled={
+                          !productAvailability[product.id]?.inStock ||
+                          (productAvailability[product.id]?.stockQuantity !== null &&
+                            capsuleQty[product.id] >= productAvailability[product.id].stockQuantity)
+                        }
+                        className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4] disabled:cursor-not-allowed disabled:opacity-35"
                       >
                         +
                       </button>

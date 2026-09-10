@@ -43,6 +43,22 @@ export interface AdminOrder {
   }>;
 }
 
+export interface AdminProduct {
+  id: string;
+  code: string;
+  name: string;
+  category: "capsules" | "espresso";
+  priceEur: number | null;
+  inStock: boolean;
+  stockQuantity: number | null;
+}
+
+export interface StoreProduct {
+  id: string;
+  inStock: boolean;
+  stockQuantity: number | null;
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<ApiResponse<T>> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -102,6 +118,10 @@ export function sendEspressoInquiry(payload: {
   });
 }
 
+export function getProducts() {
+  return request<StoreProduct[]>("/products", { method: "GET" });
+}
+
 export function getAdminOrders(adminKey: string) {
   return request<AdminOrder[]>("/orders/admin", {
     method: "GET",
@@ -114,5 +134,25 @@ export function updateAdminOrderStatus(adminKey: string, orderId: string, status
     method: "PATCH",
     headers: { "x-admin-key": adminKey },
     body: JSON.stringify({ status }),
+  });
+}
+
+export function getAdminProducts(adminKey: string) {
+  return request<AdminProduct[]>("/products/admin", {
+    method: "GET",
+    headers: { "x-admin-key": adminKey },
+  });
+}
+
+export function updateAdminProductInventory(
+  adminKey: string,
+  productCode: string,
+  stockQuantity: number | null,
+  inStock: boolean,
+) {
+  return request<AdminProduct>(`/products/admin/${productCode}/inventory`, {
+    method: "PATCH",
+    headers: { "x-admin-key": adminKey },
+    body: JSON.stringify({ stockQuantity, inStock }),
   });
 }

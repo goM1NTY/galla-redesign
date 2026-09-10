@@ -10,7 +10,6 @@ export async function ensureSeedProducts() {
         category: product.category,
         description: product.description,
         priceEur: product.priceEur,
-        inStock: product.inStock,
       },
       create: {
         code: product.code,

@@ -1,6 +1,14 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { AdminOrder, FulfillmentStatus, getAdminOrders, updateAdminOrderStatus } from "@/lib/api";
+import {
+  AdminOrder,
+  AdminProduct,
+  FulfillmentStatus,
+  getAdminOrders,
+  getAdminProducts,
+  updateAdminOrderStatus,
+  updateAdminProductInventory,
+} from "@/lib/api";
 
 const STATUSES: FulfillmentStatus[] = ["NEW", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"];
 type AdminLanguage = "en" | "sq";
@@ -27,6 +35,15 @@ const adminTranslations = {
     notRecorded: "Not recorded",
     loadError: "Could not load orders",
     updateError: "Could not update order",
+    inventory: "Inventory",
+    inventoryHelp: "Leave quantity empty to keep stock untracked.",
+    quantity: "Quantity",
+    tracked: "Tracked",
+    untracked: "Not tracked",
+    available: "Available",
+    unavailable: "Unavailable",
+    save: "Save",
+    inventoryError: "Could not update inventory",
     statuses: { NEW: "NEW", CONFIRMED: "CONFIRMED", SHIPPED: "SHIPPED", DELIVERED: "DELIVERED", CANCELLED: "CANCELLED" },
   },
   sq: {
@@ -50,6 +67,15 @@ const adminTranslations = {
     notRecorded: "Nuk është regjistruar",
     loadError: "Porositë nuk mund të ngarkoheshin",
     updateError: "Statusi nuk mund të ndryshohej",
+    inventory: "Inventari",
+    inventoryHelp: "Lëreni sasinë bosh për të mos e gjurmuar stokun.",
+    quantity: "Sasia",
+    tracked: "I gjurmuar",
+    untracked: "Nuk gjurmohet",
+    available: "Në dispozicion",
+    unavailable: "Nuk është në dispozicion",
+    save: "Ruaj",
+    inventoryError: "Inventari nuk mund të ndryshohej",
     statuses: { NEW: "E RE", CONFIRMED: "E KONFIRMUAR", SHIPPED: "E DËRGUAR", DELIVERED: "E DORËZUAR", CANCELLED: "E ANULUAR" },
   },
 };
@@ -94,18 +120,24 @@ const AdminOrders = () => {
   const t = adminTranslations[language];
   const [adminKey, setAdminKey] = useState(() => window.sessionStorage.getItem("galla_admin_key") || "");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
+  const [stockDrafts, setStockDrafts] = useState<Record<string, string>>({});
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [updatingProductCode, setUpdatingProductCode] = useState<string | null>(null);
 
   const loadOrders = async (event?: FormEvent) => {
     event?.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const result = await getAdminOrders(adminKey);
-      setOrders(result.data || []);
+      const [ordersResult, productsResult] = await Promise.all([getAdminOrders(adminKey), getAdminProducts(adminKey)]);
+      const loadedProducts = productsResult.data || [];
+      setOrders(ordersResult.data || []);
+      setProducts(loadedProducts);
+      setStockDrafts(Object.fromEntries(loadedProducts.map((product) => [product.code, product.stockQuantity?.toString() || ""])));
       setAuthenticated(true);
       window.sessionStorage.setItem("galla_admin_key", adminKey);
     } catch (requestError) {
@@ -133,7 +165,31 @@ const AdminOrders = () => {
     window.sessionStorage.removeItem("galla_admin_key");
     setAdminKey("");
     setOrders([]);
+    setProducts([]);
     setAuthenticated(false);
+  };
+
+  const saveInventory = async (product: AdminProduct, nextInStock = product.inStock) => {
+    const value = stockDrafts[product.code]?.trim() || "";
+    const stockQuantity = value === "" ? null : Number(value);
+    if (stockQuantity !== null && (!Number.isInteger(stockQuantity) || stockQuantity < 0)) {
+      setError(t.inventoryError);
+      return;
+    }
+
+    setUpdatingProductCode(product.code);
+    setError("");
+    try {
+      const result = await updateAdminProductInventory(adminKey, product.code, stockQuantity, nextInStock);
+      if (result.data) {
+        setProducts((current) => current.map((item) => (item.code === product.code ? result.data! : item)));
+        setStockDrafts((current) => ({ ...current, [product.code]: result.data!.stockQuantity?.toString() || "" }));
+      }
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : t.inventoryError);
+    } finally {
+      setUpdatingProductCode(null);
+    }
   };
 
   const changeLanguage = (nextLanguage: AdminLanguage) => {
@@ -193,6 +249,47 @@ const AdminOrders = () => {
       </header>
       <main className="mx-auto max-w-7xl px-4 py-8">
         {error && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        <section className="mb-8 rounded-xl border border-[#dfd4ca] bg-white p-5 shadow-sm">
+          <h2 className="font-serif text-2xl">{t.inventory}</h2>
+          <p className="mt-1 text-sm text-[#62584f]">{t.inventoryHelp}</p>
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {products.filter((product) => product.category === "capsules").map((product) => (
+              <article key={product.code} className="rounded-lg border border-[#e3d9d0] p-4">
+                <p className="font-semibold">{product.name}</p>
+                <p className="text-xs text-[#62584f]">{product.code}</p>
+                <label className="mt-3 block text-xs font-bold uppercase tracking-[0.08em]" htmlFor={`stock-${product.code}`}>{t.quantity}</label>
+                <input
+                  id={`stock-${product.code}`}
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={stockDrafts[product.code] || ""}
+                  placeholder={t.untracked}
+                  onChange={(event) => setStockDrafts((current) => ({ ...current, [product.code]: event.target.value }))}
+                  className="mt-1 w-full rounded-md border border-[#d6c8bb] px-3 py-2"
+                />
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    disabled={updatingProductCode === product.code}
+                    onClick={() => saveInventory(product)}
+                    className="flex-1 rounded-md bg-[#9e0102] px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                  >
+                    {t.save}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={updatingProductCode === product.code}
+                    onClick={() => saveInventory(product, !product.inStock)}
+                    className={`flex-1 rounded-md border px-3 py-2 text-xs font-bold ${product.inStock ? "border-green-400 bg-green-50 text-green-800" : "border-red-400 bg-red-50 text-red-800"}`}
+                  >
+                    {product.inStock ? t.available : t.unavailable}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
         <p className="mb-5 text-sm text-[#62584f]">{t.latest} {orders.length} {t.orderCount}</p>
         <div className="space-y-4">
           {orders.map((order) => (

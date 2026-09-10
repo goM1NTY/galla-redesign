@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { FulfillmentStatus, PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
-import type { RequestHandler } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
+import { requireAdmin } from "../middleware/admin.js";
 import {
   sendCapsuleOrderNotification,
   sendCapsuleOrderConfirmation,
@@ -44,23 +44,6 @@ const EUR_TO_MKD_RATE =
   Number.isFinite(configuredEurToMkdRate) && configuredEurToMkdRate > 0 ? configuredEurToMkdRate : 61.5;
 const SHIPPING_MKD_CENTS = 12_000;
 const FREE_SHIPPING_MKD_CENTS = 215_000;
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
-
-const requireAdmin: RequestHandler = (req, res, next) => {
-  if (!ADMIN_API_KEY) {
-    return res.status(503).json({ success: false, error: "Admin access is not configured" });
-  }
-
-  const suppliedKey = req.header("x-admin-key") || "";
-  const expected = Buffer.from(ADMIN_API_KEY);
-  const supplied = Buffer.from(suppliedKey);
-  if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
-    return res.status(401).json({ success: false, error: "Invalid admin access key" });
-  }
-
-  next();
-};
-
 const fulfillmentStatusSchema = z.object({
   status: z.nativeEnum(FulfillmentStatus),
 });
@@ -88,14 +71,54 @@ ordersRouter.patch("/admin/:orderId/status", requireAdmin, async (req, res) => {
   }
 
   try {
-    const order = await prisma.order.update({
-      where: { id: req.params.orderId },
-      data: { fulfillmentStatus: parsed.data.status },
+    const order = await prisma.$transaction(async (tx) => {
+      const currentOrder = await tx.order.findUnique({
+        where: { id: req.params.orderId },
+        include: { items: { include: { product: { select: { stockQuantity: true } } } } },
+      });
+      if (!currentOrder) throw new Error("ORDER_NOT_FOUND");
+
+      const commitsInventory = parsed.data.status !== FulfillmentStatus.NEW && parsed.data.status !== FulfillmentStatus.CANCELLED;
+      if (commitsInventory && !currentOrder.inventoryCommittedAt) {
+        for (const item of currentOrder.items) {
+          if (item.product.stockQuantity === null) continue;
+          const updated = await tx.product.updateMany({
+            where: { id: item.productId, stockQuantity: { gte: item.quantity } },
+            data: { stockQuantity: { decrement: item.quantity } },
+          });
+          if (updated.count !== 1) throw new Error("INSUFFICIENT_STOCK");
+          await tx.product.updateMany({
+            where: { id: item.productId, stockQuantity: 0 },
+            data: { inStock: false },
+          });
+        }
+      }
+
+      if (parsed.data.status === FulfillmentStatus.CANCELLED && currentOrder.inventoryCommittedAt) {
+        for (const item of currentOrder.items) {
+          if (item.product.stockQuantity === null) continue;
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stockQuantity: { increment: item.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { id: currentOrder.id },
+        data: {
+          fulfillmentStatus: parsed.data.status,
+          inventoryCommittedAt: commitsInventory ? currentOrder.inventoryCommittedAt || new Date() : null,
+        },
+      });
     });
     return res.json({ success: true, data: order });
   } catch (error) {
-    if (typeof error === "object" && error && "code" in error && error.code === "P2025") {
+    if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
       return res.status(404).json({ success: false, error: "Order not found" });
+    }
+    if (error instanceof Error && error.message === "INSUFFICIENT_STOCK") {
+      return res.status(409).json({ success: false, error: "Not enough stock to confirm this order" });
     }
     throw error;
   }
@@ -113,7 +136,7 @@ ordersRouter.post("/capsules", async (req, res) => {
 
   const capsuleProducts = await prisma.product.findMany({
     where: { category: ProductCategory.capsules },
-    select: { id: true, code: true, name: true, priceEur: true, inStock: true },
+    select: { id: true, code: true, name: true, priceEur: true, inStock: true, stockQuantity: true },
   });
   const productsByCode = new Map(capsuleProducts.map((product) => [product.code, product]));
   const duplicateProductIds = parsed.data.items
@@ -136,6 +159,18 @@ ordersRouter.post("/capsules", async (req, res) => {
       success: false,
       error: "Order contains unknown, unavailable, or unpriced capsule products",
       details: unavailableItems.map((item) => item.productId),
+    });
+  }
+
+  const insufficientStockItems = parsed.data.items.filter((item) => {
+    const stockQuantity = productsByCode.get(item.productId)?.stockQuantity;
+    return stockQuantity !== null && stockQuantity !== undefined && item.quantity > stockQuantity;
+  });
+  if (insufficientStockItems.length > 0) {
+    return res.status(409).json({
+      success: false,
+      error: "Requested quantity exceeds available stock",
+      details: insufficientStockItems.map((item) => item.productId),
     });
   }
 

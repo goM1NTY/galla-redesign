@@ -1,0 +1,18 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - paragraph [ref=e6]: Galla internal
+        - generic "Language" [ref=e7]:
+          - button "EN" [ref=e8] [cursor=pointer]
+          - button "AL" [ref=e9] [cursor=pointer]
+      - heading "Order Management" [level=1] [ref=e10]
+      - paragraph [ref=e11]: Enter the admin access key to continue.
+      - generic [ref=e12]: Admin access key
+      - textbox "Admin access key" [ref=e13]
+      - button "Open Orders" [ref=e14] [cursor=pointer]
+      - link "Back to website" [ref=e15] [cursor=pointer]:
+        - /url: /

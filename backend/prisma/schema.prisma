@@ -15,6 +15,7 @@ model Product {
   description      String
   priceEur         Float?
   inStock          Boolean                 @default(true)
+  stockQuantity    Int?
   createdAt        DateTime                @default(now())
   updatedAt        DateTime                @updatedAt
   orderItems       OrderItem[]
@@ -47,6 +48,7 @@ model Order {
   paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)
   paymentStatus   PaymentStatus @default(PENDING)
   fulfillmentStatus FulfillmentStatus @default(NEW)
+  inventoryCommittedAt DateTime?
   subtotalCents   Int?
   shippingCents   Int?
   totalCents      Int?

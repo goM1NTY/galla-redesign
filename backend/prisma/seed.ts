@@ -12,7 +12,6 @@ async function main() {
         category: product.category,
         description: product.description,
         priceEur: product.priceEur,
-        inStock: product.inStock,
       },
       create: product,
     });

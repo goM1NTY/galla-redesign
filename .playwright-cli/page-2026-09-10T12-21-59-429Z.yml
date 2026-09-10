@@ -1,0 +1,64 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Galla Espresso Italiano" [ref=e7]
+        - navigation [ref=e9]:
+          - link "Collections" [ref=e10] [cursor=pointer]:
+            - /url: /all-products
+          - link "Capsules" [ref=e11] [cursor=pointer]:
+            - /url: /capsules
+          - link "About Us" [ref=e12] [cursor=pointer]:
+            - /url: /#about
+          - link "Contact" [ref=e13] [cursor=pointer]:
+            - /url: /#contact
+    - main [ref=e14]:
+      - link "← Back to Galla" [ref=e15] [cursor=pointer]:
+        - /url: /
+      - paragraph [ref=e16]: Store information
+      - heading "Privacy Policy" [level=1] [ref=e17]
+      - paragraph [ref=e18]: This policy explains how Galla Caffe uses personal information submitted through this website.
+      - paragraph [ref=e19]: "Last updated: 10 September 2026"
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - heading "Information we collect" [level=2] [ref=e22]
+          - paragraph [ref=e23]: For orders, we collect your name, email, phone number, delivery address, city, postal code, ordered items and payment method. For enquiries, we collect the information you enter in the contact form.
+        - generic [ref=e24]:
+          - heading "Why we use it" [level=2] [ref=e25]
+          - paragraph [ref=e26]: We use this information to process and deliver orders, provide confirmations and customer support, prevent misuse, keep accounting records and meet legal obligations. Order processing is necessary to perform the purchase contract.
+        - generic [ref=e27]:
+          - heading "Who receives it" [level=2] [ref=e28]
+          - paragraph [ref=e29]: Information is shared only when needed with hosting, database, email and delivery providers, payment providers when card payments are introduced, and authorities when legally required. We do not sell personal information or use order emails for marketing without separate consent.
+        - generic [ref=e30]:
+          - heading "Retention and security" [level=2] [ref=e31]
+          - paragraph [ref=e32]: Order records are kept only as long as needed for fulfilment, accounting, disputes and applicable legal requirements. Contact enquiries are deleted when no longer needed. Appropriate access controls and technical safeguards are used.
+        - generic [ref=e33]:
+          - heading "Your rights" [level=2] [ref=e34]
+          - paragraph [ref=e35]: You may request access, correction, deletion, restriction or objection where applicable by contacting us. You may also contact the Agency for Personal Data Protection of North Macedonia.
+        - generic [ref=e36]:
+          - heading "Cookies" [level=2] [ref=e37]
+          - paragraph [ref=e38]: The current store uses essential browser storage for the cart and language preference. If analytics or advertising cookies are introduced, this policy and the consent controls must be updated before they are enabled.
+    - contentinfo [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: Galla Caffe
+            - paragraph [ref=e44]: Ilindenska 160, Tetovo, North Macedonia
+            - paragraph [ref=e45]: minetamexhiti01@gmail.com · +389 44 333 375
+          - navigation "Store policies" [ref=e46]:
+            - link "Privacy Policy" [ref=e47] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms & Conditions" [ref=e48] [cursor=pointer]:
+              - /url: /terms
+            - link "Shipping Policy" [ref=e49] [cursor=pointer]:
+              - /url: /shipping
+            - link "Returns & Refunds" [ref=e50] [cursor=pointer]:
+              - /url: /returns
+            - link "Company Details" [ref=e51] [cursor=pointer]:
+              - /url: /company-details
+        - paragraph [ref=e52]: © 2026 Galla Caffe. All rights reserved.

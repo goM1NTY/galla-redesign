@@ -1,0 +1,204 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - button "EN" [ref=e7] [cursor=pointer]
+          - button "AL" [ref=e8] [cursor=pointer]
+          - button "MK" [ref=e9] [cursor=pointer]
+        - img "Galla Espresso Italiano" [ref=e11]
+        - navigation [ref=e12]:
+          - link "Collections" [ref=e13] [cursor=pointer]:
+            - /url: /all-products
+          - link "About Us" [ref=e14] [cursor=pointer]:
+            - /url: "#about"
+          - link "Capsules" [ref=e15] [cursor=pointer]:
+            - /url: /capsules
+          - link "Contact" [ref=e16] [cursor=pointer]:
+            - /url: "#contact"
+    - region [ref=e19]:
+      - generic [ref=e21]:
+        - group [ref=e22]:
+          - article [ref=e24]:
+            - generic [ref=e25]:
+              - link "Order Now" [ref=e27] [cursor=pointer]:
+                - /url: /capsules
+              - img "GALLA CLASSIC - CAPSULES" [ref=e28]
+            - heading "GALLA CLASSIC - CAPSULES" [level=3] [ref=e30]
+        - group [ref=e31]:
+          - article [ref=e33]:
+            - generic [ref=e34]:
+              - link "Order Now" [ref=e36] [cursor=pointer]:
+                - /url: /capsules
+              - img "GALLA AROMA - CAPSULES" [ref=e37]
+            - heading "GALLA AROMA - CAPSULES" [level=3] [ref=e39]
+        - group [ref=e40]:
+          - article [ref=e42]:
+            - img "GALLA CLASSIC" [ref=e44]
+            - heading "GALLA CLASSIC" [level=3] [ref=e46]
+        - group [ref=e47]:
+          - article [ref=e49]:
+            - img "GALLA AROMA" [ref=e51]
+            - heading "GALLA AROMA" [level=3] [ref=e53]
+        - group [ref=e54]:
+          - article [ref=e56]:
+            - img "GALLA CREAM" [ref=e58]
+            - heading "GALLA CREAM" [level=3] [ref=e60]
+        - group [ref=e61]:
+          - article [ref=e63]:
+            - img "GALLA BLACK PREMIUM" [ref=e65]
+            - heading "GALLA BLACK PREMIUM" [level=3] [ref=e67]
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - paragraph [ref=e73]: Galla Espresso
+        - heading "Italian Roast, Balanced Character" [level=2] [ref=e74]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - img "Galla espresso beans" [ref=e77]
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: From Bean To Cup
+            - paragraph [ref=e81]: Carefully selected green beans, precision roasting, and controlled blending create a consistent cup.
+        - generic [ref=e82]:
+          - paragraph [ref=e83]: Espresso is a wonderful blend of Arabica and Robusta coffees with controlled quality and Italian-style roasting. With our expertise and technique in coffee production, the result is a sweet, aromatic, and deeply enjoyable espresso experience.
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - paragraph [ref=e86]: Classic
+              - paragraph [ref=e87]: High-quality Arabica with selected Robusta from South America. Longer roast for smooth crema and intense espresso.
+            - generic [ref=e88]:
+              - paragraph [ref=e89]: Aroma
+              - paragraph [ref=e90]: High-quality Arabica and Asiatic Robusta crafted for richer aroma and balanced body.
+            - generic [ref=e91]:
+              - paragraph [ref=e92]: Cream
+              - paragraph [ref=e93]: Smooth middle-roast blend with creamy texture and clean finish for daily enjoyment.
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - paragraph [ref=e99]: Black Premium
+        - heading "Deep Character. Elite Blend." [level=2] [ref=e100]
+        - paragraph [ref=e101]: "This incredible mixture is made from high-quality, carefully selected beans: 100% Arabica from the plains of Brazil and Africa."
+        - paragraph [ref=e102]: The combination of bean origin delivers a unique experience with strong flavor, complete body, and a balanced acidity profile.
+        - generic [ref=e103]:
+          - article [ref=e104]:
+            - paragraph [ref=e105]: 200 Premium
+            - paragraph [ref=e106]: Since 2016, our distribution network includes Black Premium espresso, crafted from the finest coffee varieties in carefully balanced proportions.
+          - article [ref=e107]:
+            - paragraph [ref=e108]: For Hospitality
+            - paragraph [ref=e109]: With rich flavor and consistent crema, this premium blend supports high-standard espresso service in premium hospitality settings.
+      - generic [ref=e110]:
+        - generic [ref=e111]:
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - paragraph [ref=e116]: Signature Product
+              - heading "Galla Black Premium" [level=3] [ref=e117]
+            - paragraph [ref=e118]: "200"
+          - img "Galla Black Premium Coffee" [ref=e119]
+        - generic [ref=e120]:
+          - paragraph [ref=e121]: From the very first cup, the difference is unmistakable.
+          - paragraph [ref=e122]: Once experienced, this coffee becomes a lasting favorite.
+    - generic [ref=e124]:
+      - generic [ref=e125]:
+        - paragraph [ref=e126]: About Us
+        - heading "Crafted Since 2005" [level=2] [ref=e127]
+        - paragraph [ref=e128]: Galla is an Italian-domestic investment established in 2005 in Tetovo. Since then, it has grown into a successful business in the local and regional market.
+        - paragraph [ref=e129]: As a factory for roasting, packaging, and distribution of coffee, with many years of tradition in this industry, Galla Kaffe offers espresso coffee in different flavors and packaging formats.
+        - paragraph [ref=e130]: The quality of Galla Kaffe products is based on the Italian style of roasting and on using the highest quality coffee beans in the world, carefully selected, roasted, blended, and packed to preserve flavor, taste, and freshness.
+        - paragraph [ref=e131]: Our aim is to provide inspiration with every cup, and we believe there is nothing better than a warm cup of Galla Espresso.
+        - generic [ref=e132]:
+          - heading "What Makes Galla Different" [level=3] [ref=e133]
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: Italian-style roasting methods combined with carefully selected beans deliver a balanced cup with consistency in aroma, crema, and body.
+            - paragraph [ref=e136]: Every blend is designed for daily coffee moments, from home brewing to professional service, while maintaining premium quality and freshness.
+            - paragraph [ref=e137]: Through constant innovation and strict quality control, Galla continues to expand flavors, packaging, and coffee experiences for modern consumers.
+        - generic [ref=e138]:
+          - heading "Our Promise" [level=3] [ref=e139]
+          - paragraph [ref=e140]: "From sourcing to final packaging, each step is guided by one promise: dependable quality in every cup. Galla works to bring the warmth of true espresso culture to everyday life with products consumers can trust and enjoy every day."
+      - generic [ref=e141]:
+        - img "Galla Classic Coffee" [ref=e143]
+        - img "Galla Aroma Coffee" [ref=e145]
+        - img "Galla Cream Coffee" [ref=e147]
+        - generic [ref=e149]:
+          - generic [ref=e150]:
+            - heading "Mission" [level=3] [ref=e151]
+            - paragraph [ref=e152]: Our mission is to serve customers with dependable quality, honest craftsmanship, and steady improvement in every product we make.
+          - generic [ref=e153]:
+            - heading "Vision" [level=3] [ref=e154]
+            - paragraph [ref=e155]: Our vision is to grow responsibly as a trusted regional coffee brand, known for consistency, care, and long-term relationships with customers and partners.
+        - img "Galla Premium Coffee" [ref=e157]
+    - generic [ref=e159]:
+      - generic [ref=e160]:
+        - paragraph [ref=e161]: Contact Us
+        - heading "Information & Address" [level=2] [ref=e162]
+        - generic [ref=e163]:
+          - paragraph [ref=e164]: Galla Caffe
+          - paragraph [ref=e165]: Ilindenska 160Tetovo, Macedonia
+          - generic [ref=e166]:
+            - paragraph [ref=e167]: +389 44 333 375
+            - paragraph [ref=e168]: +389 71 224 557
+            - paragraph [ref=e169]: +385 98 191 2003
+          - paragraph [ref=e170]: minetamexhiti01@gmail.com
+        - generic [ref=e171]:
+          - paragraph [ref=e172]: Kosovo
+          - paragraph [ref=e173]: NPSH Orient
+          - paragraph [ref=e174]: Rr. Rexhep Bislimi, FERIZAJ
+          - generic [ref=e175]:
+            - paragraph [ref=e176]: 044 817 074
+            - paragraph [ref=e177]: 045 677 736
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - generic [ref=e181]: Your Name (required)
+          - textbox "Your Name (required)" [ref=e182]
+        - generic [ref=e183]:
+          - generic [ref=e184]: Your Email (required)
+          - textbox "Your Email (required)" [ref=e185]
+        - generic [ref=e186]:
+          - generic [ref=e187]: Subject
+          - textbox "Subject" [ref=e188]
+        - generic [ref=e189]:
+          - generic [ref=e190]: Your Message
+          - textbox "Your Message" [ref=e191]
+        - button "Send" [ref=e192] [cursor=pointer]
+    - contentinfo [ref=e193]:
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - heading "Galla Espresso" [level=3] [ref=e196]
+          - paragraph [ref=e197]: Crafted coffee blends and capsules with Italian roasting character since 2005.
+        - generic [ref=e198]:
+          - paragraph [ref=e199]: Menu
+          - generic [ref=e200]:
+            - paragraph [ref=e201]:
+              - link "Products" [ref=e202] [cursor=pointer]:
+                - /url: "#products"
+            - paragraph [ref=e203]:
+              - link "Galla Espresso" [ref=e204] [cursor=pointer]:
+                - /url: "#espresso"
+            - paragraph [ref=e205]:
+              - link "Galla Capsules" [ref=e206] [cursor=pointer]:
+                - /url: /capsules
+            - paragraph [ref=e207]:
+              - link "Black Premium" [ref=e208] [cursor=pointer]:
+                - /url: "#premium"
+            - paragraph [ref=e209]:
+              - link "Contact" [ref=e210] [cursor=pointer]:
+                - /url: "#contact"
+        - generic [ref=e211]:
+          - paragraph [ref=e212]: Contact
+          - generic [ref=e213]:
+            - paragraph [ref=e214]: Ilindenska 160, Tetovo, Macedonia
+            - paragraph [ref=e215]: +389 44 333 375
+            - paragraph [ref=e216]: +389 71 224 557
+            - paragraph [ref=e217]: minetamexhiti01@gmail.com
+      - generic [ref=e218]:
+        - paragraph [ref=e219]: © 2026 Galla Caffe. All rights reserved.
+        - navigation "Store policies" [ref=e220]:
+          - link "Privacy" [ref=e221] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e222] [cursor=pointer]:
+            - /url: /terms
+          - link "Shipping" [ref=e223] [cursor=pointer]:
+            - /url: /shipping
+          - link "Returns" [ref=e224] [cursor=pointer]:
+            - /url: /returns
+          - link "Company Details" [ref=e225] [cursor=pointer]:
+            - /url: /company-details

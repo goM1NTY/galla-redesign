@@ -1,0 +1,209 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Galla Espresso Italiano" [ref=e7]
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - button "EN" [ref=e10] [cursor=pointer]
+            - button "AL" [ref=e11] [cursor=pointer]
+            - button "MK" [ref=e12] [cursor=pointer]
+          - navigation [ref=e13]:
+            - link "Collections" [ref=e14] [cursor=pointer]:
+              - /url: /all-products
+            - link "Capsules" [ref=e15] [cursor=pointer]:
+              - /url: /capsules
+            - link "About Us" [ref=e16] [cursor=pointer]:
+              - /url: /#about
+            - link "Contact" [ref=e17] [cursor=pointer]:
+              - /url: /#contact
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - paragraph [ref=e21]:
+          - link "Home" [ref=e22] [cursor=pointer]:
+            - /url: /
+          - text: "> Capsules"
+        - paragraph [ref=e23]: New Product Line
+        - heading "The Art of Espresso, Encapsulated" [level=1] [ref=e24]
+        - paragraph [ref=e25]: Discover the exquisite Galla collection.
+      - generic [ref=e27]:
+        - article [ref=e28]:
+          - img "Capsules Classic" [ref=e30]
+          - generic [ref=e31]:
+            - generic [ref=e32]:
+              - generic [ref=e33]:
+                - heading "Capsules Classic" [level=2] [ref=e34]
+                - paragraph [ref=e35]: Standard Pack
+              - paragraph [ref=e36]: EUR 6.40394 MKD
+            - paragraph [ref=e37]: The quintessential Galla experience. A harmonious blend with a velvety crema and a smooth, lingering finish.
+            - generic [ref=e38]:
+              - paragraph [ref=e39]:
+                - generic [ref=e40]: "Weight:"
+                - text: 10 capsules x 5 g (50 g)
+              - paragraph [ref=e41]:
+                - generic [ref=e42]: "Roast:"
+                - text: Medium
+              - paragraph [ref=e43]:
+                - generic [ref=e44]: "Intensity:"
+                - text: 7/10
+              - paragraph [ref=e45]:
+                - generic [ref=e46]: "Format:"
+                - text: Box of 10 capsules
+              - paragraph [ref=e47]:
+                - generic [ref=e48]: "Compatibility:"
+                - text: Nespresso Original compatible
+            - generic [ref=e49]:
+              - paragraph [ref=e50]: In stock
+              - paragraph [ref=e51]: Delivery in 3–5 business days
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - button "-" [ref=e54] [cursor=pointer]
+                - generic [ref=e55]: "0"
+                - button "+" [ref=e56] [cursor=pointer]
+              - paragraph [ref=e57]: VAT included
+        - article [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]: 50X
+            - img "Capsules Classic" [ref=e61]
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - heading "Capsules Classic" [level=2] [ref=e65]
+                - paragraph [ref=e66]: Value Pack
+              - paragraph [ref=e67]: EUR 28.901777 MKD
+            - paragraph [ref=e68]: The same signature Classic profile in a larger box for high-volume use and longer stock at home or office.
+            - generic [ref=e69]:
+              - paragraph [ref=e70]:
+                - generic [ref=e71]: "Weight:"
+                - text: 50 capsules x 5.5 g (275 g)
+              - paragraph [ref=e72]:
+                - generic [ref=e73]: "Roast:"
+                - text: Medium
+              - paragraph [ref=e74]:
+                - generic [ref=e75]: "Intensity:"
+                - text: 7/10
+              - paragraph [ref=e76]:
+                - generic [ref=e77]: "Format:"
+                - text: Box of 50 capsules
+              - paragraph [ref=e78]:
+                - generic [ref=e79]: "Compatibility:"
+                - text: Nespresso Original compatible
+            - generic [ref=e80]:
+              - paragraph [ref=e81]: In stock
+              - paragraph [ref=e82]: Delivery in 3–5 business days
+            - generic [ref=e83]:
+              - generic [ref=e84]:
+                - button "-" [ref=e85] [cursor=pointer]
+                - generic [ref=e86]: "0"
+                - button "+" [ref=e87] [cursor=pointer]
+              - paragraph [ref=e88]: VAT included
+        - article [ref=e89]:
+          - img "Capsules Aroma" [ref=e91]
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - heading "Capsules Aroma" [level=2] [ref=e95]
+              - paragraph [ref=e96]: EUR 6.90424 MKD
+            - paragraph [ref=e97]: An olfactory journey. This medium-dark roast reveals deep floral notes and a sophisticated, cocoa-toned aftertaste.
+            - generic [ref=e98]:
+              - paragraph [ref=e99]:
+                - generic [ref=e100]: "Weight:"
+                - text: 10 capsules x 5 g (50 g)
+              - paragraph [ref=e101]:
+                - generic [ref=e102]: "Roast:"
+                - text: Medium-Dark
+              - paragraph [ref=e103]:
+                - generic [ref=e104]: "Intensity:"
+                - text: 8/10
+              - paragraph [ref=e105]:
+                - generic [ref=e106]: "Format:"
+                - text: Box of 10 capsules
+              - paragraph [ref=e107]:
+                - generic [ref=e108]: "Compatibility:"
+                - text: Nespresso Original compatible
+            - generic [ref=e109]:
+              - paragraph [ref=e110]: In stock
+              - paragraph [ref=e111]: Delivery in 3–5 business days
+            - generic [ref=e112]:
+              - generic [ref=e113]:
+                - button "-" [ref=e114] [cursor=pointer]
+                - generic [ref=e115]: "0"
+                - button "+" [ref=e116] [cursor=pointer]
+              - paragraph [ref=e117]: VAT included
+      - generic [ref=e118]:
+        - paragraph [ref=e119]: Espresso Products
+        - heading "Also Available To Order" [level=2] [ref=e120]
+        - paragraph [ref=e121]: Classic, Aroma, Cream, and Black espresso are also available for purchase. Prices are not displayed yet. Contact us for order details.
+        - generic [ref=e122]:
+          - article [ref=e123]:
+            - img "Galla Classic" [ref=e125]
+            - heading "Galla Classic" [level=3] [ref=e126]
+            - paragraph [ref=e127]: This unique mixture combines high quality Arabica beans with selected Robusta beans from South America for a smooth crema and strong espresso character.
+            - generic [ref=e128]:
+              - paragraph [ref=e129]: Available For Order
+              - button "Request Offer" [ref=e130] [cursor=pointer]
+          - article [ref=e131]:
+            - img "Galla Aroma" [ref=e133]
+            - heading "Galla Aroma" [level=3] [ref=e134]
+            - paragraph [ref=e135]: Well defined mixture of high quality Arabica and Asiatic Robusta, carefully controlled and medium roasted for rich aroma and balance.
+            - generic [ref=e136]:
+              - paragraph [ref=e137]: Available For Order
+              - button "Request Offer" [ref=e138] [cursor=pointer]
+          - article [ref=e139]:
+            - img "Galla Cream" [ref=e141]
+            - heading "Galla Cream" [level=3] [ref=e142]
+            - paragraph [ref=e143]: Balanced middle-roast blend with creamy texture and clean finish, crafted for consistent daily espresso enjoyment.
+            - generic [ref=e144]:
+              - paragraph [ref=e145]: Available For Order
+              - button "Request Offer" [ref=e146] [cursor=pointer]
+          - article [ref=e147]:
+            - img "Galla Black" [ref=e149]
+            - heading "Galla Black" [level=3] [ref=e150]
+            - paragraph [ref=e151]: Premium espresso blend with deep character, full body, and balanced acidity for customers who prefer stronger flavor notes.
+            - generic [ref=e152]:
+              - paragraph [ref=e153]: Available For Order
+              - button "Request Offer" [ref=e154] [cursor=pointer]
+        - generic [ref=e155]:
+          - paragraph [ref=e156]: Espresso Inquiry Form
+          - generic [ref=e157]:
+            - generic [ref=e158]:
+              - checkbox "Galla Classic" [ref=e159]
+              - text: Galla Classic
+            - generic [ref=e160]:
+              - checkbox "Galla Aroma" [ref=e161]
+              - text: Galla Aroma
+            - generic [ref=e162]:
+              - checkbox "Galla Cream" [ref=e163]
+              - text: Galla Cream
+            - generic [ref=e164]:
+              - checkbox "Galla Black" [ref=e165]
+              - text: Galla Black
+          - generic [ref=e166]:
+            - textbox "Your name" [ref=e167]
+            - textbox "Your email" [ref=e168]
+            - textbox [ref=e169]
+            - textbox "Message (optional)" [ref=e170]
+          - button "Send Inquiry" [disabled] [ref=e171]
+    - contentinfo [ref=e172]:
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - paragraph [ref=e176]: Galla Caffe
+            - paragraph [ref=e177]: Ilindenska 160, Tetovo, North Macedonia
+            - paragraph [ref=e178]: minetamexhiti01@gmail.com · +389 44 333 375
+          - navigation "Store policies" [ref=e179]:
+            - link "Privacy Policy" [ref=e180] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms & Conditions" [ref=e181] [cursor=pointer]:
+              - /url: /terms
+            - link "Shipping Policy" [ref=e182] [cursor=pointer]:
+              - /url: /shipping
+            - link "Returns & Refunds" [ref=e183] [cursor=pointer]:
+              - /url: /returns
+            - link "Company Details" [ref=e184] [cursor=pointer]:
+              - /url: /company-details
+        - paragraph [ref=e185]: © 2026 Galla Caffe. All rights reserved.
