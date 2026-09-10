@@ -44,6 +44,10 @@ model Order {
   postalCode      String?
   paymentMethod   PaymentMethod @default(CASH_ON_DELIVERY)
   paymentStatus   PaymentStatus @default(PENDING)
+  subtotalCents   Int?
+  shippingCents   Int?
+  totalCents      Int?
+  currency        String        @default("EUR")
   note          String?
   createdAt     DateTime    @default(now())
   items         OrderItem[]
@@ -56,6 +60,8 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
+  unitPriceCents Int?
+  lineTotalCents Int?
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 

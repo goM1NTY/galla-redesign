@@ -4,7 +4,7 @@
 
 2. [ ] **Build secure card checkout.** Add “Card” beside “Cash on delivery,” redirect card customers to the bank's hosted payment page, verify the bank callback on the backend, and set orders to `PAID`, `FAILED`, or `CANCELLED`. Never store card details.
 
-3. [ ] **Calculate totals on the backend.** Read product prices from the database, calculate shipping and the final total on the server, and save those amounts with the order. Do not trust totals sent by the browser.
+3. [x] **Calculate totals on the backend.** Product prices now come from the database; the backend calculates shipping and saves immutable unit prices, line totals, subtotal, shipping, final total, and currency with each order.
 
 4. [ ] **Add order confirmation.** Show an order number after checkout and email the customer their items, total, delivery address, payment method, and order status.
 

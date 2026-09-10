@@ -20,7 +20,7 @@ const capsuleOrderSchema = z.object({
     .array(
       z.object({
         productId: z.string().trim().min(1),
-        quantity: z.number().int().min(1),
+        quantity: z.number().int().min(1).max(100),
       }),
     )
     .min(1),
@@ -48,17 +48,47 @@ ordersRouter.post("/capsules", async (req, res) => {
 
   const capsuleProducts = await prisma.product.findMany({
     where: { category: ProductCategory.capsules },
-    select: { id: true, code: true },
+    select: { id: true, code: true, name: true, priceEur: true, inStock: true },
   });
-  const productCodeToId = new Map(capsuleProducts.map((product) => [product.code, product.id]));
-  const unknownItems = parsed.data.items.filter((item) => !productCodeToId.has(item.productId));
-  if (unknownItems.length > 0) {
+  const productsByCode = new Map(capsuleProducts.map((product) => [product.code, product]));
+  const duplicateProductIds = parsed.data.items
+    .map((item) => item.productId)
+    .filter((productId, index, allIds) => allIds.indexOf(productId) !== index);
+  if (duplicateProductIds.length > 0) {
     return res.status(400).json({
       success: false,
-      error: "Order contains unknown capsule product IDs",
-      details: unknownItems.map((item) => item.productId),
+      error: "Each capsule product may appear only once per order",
+      details: [...new Set(duplicateProductIds)],
     });
   }
+
+  const unavailableItems = parsed.data.items.filter((item) => {
+    const product = productsByCode.get(item.productId);
+    return !product || !product.inStock || product.priceEur === null;
+  });
+  if (unavailableItems.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: "Order contains unknown, unavailable, or unpriced capsule products",
+      details: unavailableItems.map((item) => item.productId),
+    });
+  }
+
+  const pricedItems = parsed.data.items.map((item) => {
+    const product = productsByCode.get(item.productId)!;
+    const unitPriceCents = Math.round(product.priceEur! * 100);
+    return {
+      productId: product.id,
+      productCode: product.code,
+      productName: product.name,
+      quantity: item.quantity,
+      unitPriceCents,
+      lineTotalCents: unitPriceCents * item.quantity,
+    };
+  });
+  const subtotalCents = pricedItems.reduce((sum, item) => sum + item.lineTotalCents, 0);
+  const shippingCents = subtotalCents >= 3500 ? 0 : 390;
+  const totalCents = subtotalCents + shippingCents;
 
   const order = await prisma.order.create({
     data: {
@@ -70,11 +100,17 @@ ordersRouter.post("/capsules", async (req, res) => {
       postalCode: parsed.data.postalCode,
       paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
       paymentStatus: PaymentStatus.PENDING,
+      subtotalCents,
+      shippingCents,
+      totalCents,
+      currency: "EUR",
       note: parsed.data.note,
       items: {
-        create: parsed.data.items.map((item) => ({
-          productId: productCodeToId.get(item.productId)!,
+        create: pricedItems.map((item) => ({
+          productId: item.productId,
           quantity: item.quantity,
+          unitPriceCents: item.unitPriceCents,
+          lineTotalCents: item.lineTotalCents,
         })),
       },
     },
@@ -91,8 +127,18 @@ ordersRouter.post("/capsules", async (req, res) => {
       postalCode: order.postalCode ?? undefined,
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
+      subtotalCents,
+      shippingCents,
+      totalCents,
+      currency: "EUR",
       note: order.note ?? undefined,
-      items: parsed.data.items,
+      items: pricedItems.map(({ productCode, productName, quantity, unitPriceCents, lineTotalCents }) => ({
+        productId: productCode,
+        productName,
+        quantity,
+        unitPriceCents,
+        lineTotalCents,
+      })),
       createdAt: order.createdAt.toISOString(),
     });
     emailSent = emailResult.sent;
@@ -110,8 +156,18 @@ ordersRouter.post("/capsules", async (req, res) => {
     postalCode: order.postalCode,
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
+    subtotalCents: order.subtotalCents,
+    shippingCents: order.shippingCents,
+    totalCents: order.totalCents,
+    currency: order.currency,
     note: order.note,
-    items: parsed.data.items,
+    items: pricedItems.map(({ productCode, productName, quantity, unitPriceCents, lineTotalCents }) => ({
+      productId: productCode,
+      productName,
+      quantity,
+      unitPriceCents,
+      lineTotalCents,
+    })),
     createdAt: order.createdAt,
   };
 

@@ -39,7 +39,14 @@ export async function sendContactNotification(message: ContactMessage) {
 }
 
 export async function sendCapsuleOrderNotification(order: CapsuleOrder) {
-  const itemsText = order.items.map((item) => `- ${item.productId}: ${item.quantity}`).join("\n");
+  const formatMoney = (cents: number) => `${order.currency} ${(cents / 100).toFixed(2)}`;
+  const itemsText = order.items
+    .map(
+      (item) =>
+        `- ${item.productName} x ${item.quantity}: ${formatMoney(item.lineTotalCents)} ` +
+        `(${formatMoney(item.unitPriceCents)} each)`,
+    )
+    .join("\n");
   const subject = `[Galla Website] Capsules Order: ${order.customerName}`;
   const text = [
     "A new capsules order was submitted.",
@@ -55,6 +62,9 @@ export async function sendCapsuleOrderNotification(order: CapsuleOrder) {
     `Note: ${order.note || "-"}`,
     "Items:",
     itemsText,
+    `Subtotal: ${formatMoney(order.subtotalCents)}`,
+    `Shipping: ${formatMoney(order.shippingCents)}`,
+    `Total: ${formatMoney(order.totalCents)}`,
     `Created At: ${order.createdAt}`,
   ].join("\n");
 

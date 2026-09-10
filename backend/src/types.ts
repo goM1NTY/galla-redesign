@@ -20,7 +20,10 @@ export interface ContactMessage {
 
 export interface CapsuleOrderItem {
   productId: string;
+  productName: string;
   quantity: number;
+  unitPriceCents: number;
+  lineTotalCents: number;
 }
 
 export interface CapsuleOrder {
@@ -33,6 +36,10 @@ export interface CapsuleOrder {
   postalCode?: string;
   paymentMethod: "CASH_ON_DELIVERY" | "CARD";
   paymentStatus: "PENDING" | "PAID" | "FAILED" | "CANCELLED";
+  subtotalCents: number;
+  shippingCents: number;
+  totalCents: number;
+  currency: "EUR";
   items: CapsuleOrderItem[];
   note?: string;
   createdAt: string;
