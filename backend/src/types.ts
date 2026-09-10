@@ -35,12 +35,14 @@ export interface CapsuleOrder {
   deliveryAddress: string;
   city: string;
   postalCode?: string;
+  deliveryCountry: string;
   paymentMethod: "CASH_ON_DELIVERY" | "CARD";
   paymentStatus: "PENDING" | "PAID" | "FAILED" | "CANCELLED";
   subtotalCents: number;
   shippingCents: number;
   totalCents: number;
   currency: string;
+  eurToMkdRate: number;
   items: CapsuleOrderItem[];
   note?: string;
   createdAt: string;

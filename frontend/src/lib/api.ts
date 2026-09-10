@@ -12,6 +12,7 @@ interface CapsuleOrderResponse {
   customerEmail: string;
   totalCents: number;
   currency: string;
+  eurToMkdRate: number;
 }
 
 async function request<T>(path: string, init: RequestInit): Promise<ApiResponse<T>> {

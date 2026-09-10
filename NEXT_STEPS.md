@@ -10,7 +10,7 @@
 
 5. [ ] **Add order management.** Create a protected admin view where Galla can see orders and update them to `CONFIRMED`, `SHIPPED`, `DELIVERED`, or `CANCELLED`.
 
-6. [ ] **Define delivery rules.** Confirm delivery countries/areas, delivery price, free-shipping threshold, delivery time, accepted currency, and the cash-on-delivery process.
+6. [x] **Define delivery rules.** Deliver across North Macedonia in 3–5 business days; delivery is 120 MKD and free above 2,150 MKD. Show EUR and MKD prices, with cash collected in MKD by the courier.
 
 7. [ ] **Add required store pages.** Publish Privacy Policy, Terms and Conditions, Shipping Policy, Returns/Refund Policy, and company/legal details; link them in the footer and checkout.
 

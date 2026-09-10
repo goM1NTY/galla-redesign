@@ -92,6 +92,11 @@ const espressoProducts = [
 ];
 
 const CART_STORAGE_KEY = "galla_capsules_cart";
+const EUR_TO_MKD_RATE = Number(import.meta.env.VITE_EUR_TO_MKD_RATE || 61.5);
+const SHIPPING_MKD = 120;
+const FREE_SHIPPING_MKD = 2150;
+const toMkd = (eur: number) => Math.round(eur * EUR_TO_MKD_RATE);
+const dualPrice = (mkd: number, rate = EUR_TO_MKD_RATE) => `EUR ${(mkd / rate).toFixed(2)} / ${mkd} MKD`;
 const INITIAL_CAPSULE_QTY = Object.fromEntries(capsuleProducts.map((product) => [product.id, 0])) as Record<string, number>;
 const capsuleTranslations = {
   en: {
@@ -110,7 +115,7 @@ const capsuleTranslations = {
     format: "Format",
     compatibility: "Compatibility",
     inStock: "In stock",
-    dispatch24: "Dispatch in 24h",
+    dispatch24: "Delivery in 3–5 business days",
     vatIncluded: "VAT included",
     orderSummary: "Order Summary",
     packsSelected: "Packs selected",
@@ -123,7 +128,7 @@ const capsuleTranslations = {
     postalCodeOptional: "Postal code (optional)",
     paymentMethod: "Payment method",
     cashOnDelivery: "Cash on delivery",
-    cashOnDeliveryHelp: "Pay the courier in cash when your order arrives.",
+    cashOnDeliveryHelp: "Pay the courier in MKD cash when your order arrives.",
     orderNoteOptional: "Order note (optional)",
     noProducts: "No products selected yet.",
     subtotal: "Subtotal",
@@ -137,7 +142,7 @@ const capsuleTranslations = {
     orderNumber: "Order number",
     confirmationEmail: "A confirmation email was sent to",
     orderFailed: "Failed to send order.",
-    freeShippingNote: "Free shipping above EUR 35. Orders are prepared within 24 hours.",
+    freeShippingNote: "Delivery across North Macedonia in 3–5 business days. Delivery is 120 MKD and free above 2,150 MKD.",
     ordersSubmittedApi: "Orders are submitted directly to the backend API.",
     espressoProducts: "Espresso Products",
     alsoAvailable: "Also Available To Order",
@@ -167,7 +172,7 @@ const capsuleTranslations = {
     format: "Formati",
     compatibility: "Përputhshmëria",
     inStock: "Në stok",
-    dispatch24: "Dërgesa brenda 24h",
+    dispatch24: "Dorëzim brenda 3–5 ditëve pune",
     vatIncluded: "TVSH e përfshirë",
     orderSummary: "Përmbledhja e Porosisë",
     packsSelected: "Paketa të zgjedhura",
@@ -180,7 +185,7 @@ const capsuleTranslations = {
     postalCodeOptional: "Kodi postar (opsional)",
     paymentMethod: "Mënyra e pagesës",
     cashOnDelivery: "Pagesë me para në dorëzim",
-    cashOnDeliveryHelp: "Paguani korrierin me para kur të mbërrijë porosia.",
+    cashOnDeliveryHelp: "Paguani korrierin me para në MKD kur të mbërrijë porosia.",
     orderNoteOptional: "Shënim porosie (opsional)",
     noProducts: "Ende nuk ka produkte të zgjedhura.",
     subtotal: "Nëntotali",
@@ -194,7 +199,7 @@ const capsuleTranslations = {
     orderNumber: "Numri i porosisë",
     confirmationEmail: "Një email konfirmimi u dërgua te",
     orderFailed: "Dërgimi i porosisë dështoi.",
-    freeShippingNote: "Transport falas mbi EUR 35. Porositë përgatiten brenda 24 orëve.",
+    freeShippingNote: "Dorëzim në gjithë Maqedoninë e Veriut brenda 3–5 ditëve pune. Transporti kushton 120 MKD dhe është falas mbi 2.150 MKD.",
     ordersSubmittedApi: "Porositë dërgohen direkt në backend API.",
     espressoProducts: "Produktet Espresso",
     alsoAvailable: "Gjithashtu në dispozicion për porosi",
@@ -224,7 +229,7 @@ const capsuleTranslations = {
     format: "Формат",
     compatibility: "Компатибилност",
     inStock: "На залиха",
-    dispatch24: "Испорака за 24ч",
+    dispatch24: "Испорака за 3–5 работни дена",
     vatIncluded: "ДДВ вклучен",
     orderSummary: "Резиме на Нарачка",
     packsSelected: "Избрани пакувања",
@@ -237,7 +242,7 @@ const capsuleTranslations = {
     postalCodeOptional: "Поштенски број (опционално)",
     paymentMethod: "Начин на плаќање",
     cashOnDelivery: "Плаќање во готово при достава",
-    cashOnDeliveryHelp: "Платете му во готово на курирот кога ќе пристигне нарачката.",
+    cashOnDeliveryHelp: "Платете му во денари на курирот кога ќе пристигне нарачката.",
     orderNoteOptional: "Белешка за нарачка (опционално)",
     noProducts: "Сè уште нема избрани производи.",
     subtotal: "Меѓузбир",
@@ -251,7 +256,7 @@ const capsuleTranslations = {
     orderNumber: "Број на нарачка",
     confirmationEmail: "Е-пошта за потврда е испратена до",
     orderFailed: "Неуспешно испраќање на нарачка.",
-    freeShippingNote: "Бесплатна достава над EUR 35. Нарачките се подготвуваат за 24 часа.",
+    freeShippingNote: "Испорака низ Северна Македонија за 3–5 работни дена. Доставата е 120 денари и е бесплатна над 2.150 денари.",
     ordersSubmittedApi: "Нарачките се испраќаат директно до backend API.",
     espressoProducts: "Еспресо Производи",
     alsoAvailable: "Исто така достапно за нарачка",
@@ -302,9 +307,12 @@ const Capsules = () => {
   );
 
   const totalCapsulePacks = selectedCapsules.reduce((sum, product) => sum + capsuleQty[product.id], 0);
-  const capsuleTotal = selectedCapsules.reduce((sum, product) => sum + product.price * capsuleQty[product.id], 0);
-  const shippingFee = totalCapsulePacks === 0 ? 0 : capsuleTotal >= 35 ? 0 : 3.9;
-  const finalTotal = capsuleTotal + shippingFee;
+  const capsuleTotalMkd = selectedCapsules.reduce(
+    (sum, product) => sum + toMkd(product.price) * capsuleQty[product.id],
+    0,
+  );
+  const shippingFeeMkd = totalCapsulePacks === 0 ? 0 : capsuleTotalMkd >= FREE_SHIPPING_MKD ? 0 : SHIPPING_MKD;
+  const finalTotalMkd = capsuleTotalMkd + shippingFeeMkd;
   const hasCapsuleSelection = totalCapsulePacks > 0;
   const [orderForm, setOrderForm] = useState({
     customerName: "",
@@ -322,6 +330,7 @@ const Capsules = () => {
     customerEmail: string;
     totalCents: number;
     currency: string;
+    eurToMkdRate: number;
   } | null>(null);
   const [espressoForm, setEspressoForm] = useState({
     customerName: "",
@@ -548,7 +557,7 @@ const Capsules = () => {
             </p>
             <p className="mt-2 text-sm text-[#3f4f43]">{t.orderSuccess}</p>
             <p className="mt-1 text-sm text-[#3f4f43]">
-              {t.total}: {confirmedOrder.currency} {(confirmedOrder.totalCents / 100).toFixed(2)}
+              {t.total}: {dualPrice(confirmedOrder.totalCents / 100, confirmedOrder.eurToMkdRate)}
             </p>
             <p className="mt-1 text-xs text-[#536057]">
               {t.confirmationEmail} {confirmedOrder.customerEmail}.
@@ -592,7 +601,9 @@ const Capsules = () => {
                         </p>
                       )}
                     </div>
-                    <p className="text-lg font-bold text-[#9e0102]">EUR {product.price.toFixed(2)}</p>
+                    <p className="text-right text-sm font-bold leading-5 text-[#9e0102]">
+                      EUR {product.price.toFixed(2)}<br />{toMkd(product.price)} MKD
+                    </p>
                   </div>
                   <p className="mt-2 min-h-[96px] text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
 
@@ -730,7 +741,7 @@ const Capsules = () => {
                 selectedCapsules.map((product) => (
                   <div key={product.id} className="flex items-center justify-between gap-2">
                     <p className="line-clamp-1">{product.name} x {capsuleQty[product.id]}</p>
-                    <p className="font-medium">EUR {(capsuleQty[product.id] * product.price).toFixed(2)}</p>
+                    <p className="text-right font-medium">{dualPrice(capsuleQty[product.id] * toMkd(product.price))}</p>
                   </div>
                 ))
               )}
@@ -739,15 +750,15 @@ const Capsules = () => {
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex items-center justify-between text-[#4b4b4b]">
                 <p>{t.subtotal}</p>
-                <p>EUR {capsuleTotal.toFixed(2)}</p>
+                <p>{dualPrice(capsuleTotalMkd)}</p>
               </div>
               <div className="flex items-center justify-between text-[#4b4b4b]">
                 <p>{t.shipping}</p>
-                <p>{shippingFee === 0 ? t.free : `EUR ${shippingFee.toFixed(2)}`}</p>
+                <p>{shippingFeeMkd === 0 ? t.free : dualPrice(shippingFeeMkd)}</p>
               </div>
               <div className="flex items-center justify-between border-t border-[#e8ddd2] pt-3 text-base font-bold text-[#1f1f1f]">
                 <p>{t.total}</p>
-                <p>EUR {finalTotal.toFixed(2)}</p>
+                <p>{dualPrice(finalTotalMkd)}</p>
               </div>
             </div>
 

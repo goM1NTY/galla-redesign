@@ -39,7 +39,11 @@ export async function sendContactNotification(message: ContactMessage) {
 }
 
 function formatCapsuleOrder(order: CapsuleOrder) {
-  const formatMoney = (cents: number) => `${order.currency} ${(cents / 100).toFixed(2)}`;
+  const formatMoney = (cents: number) => {
+    const mkd = cents / 100;
+    const eur = mkd / order.eurToMkdRate;
+    return `${Math.round(mkd)} MKD / EUR ${eur.toFixed(2)}`;
+  };
   const itemsText = order.items
     .map(
       (item) =>
@@ -55,6 +59,8 @@ function formatCapsuleOrder(order: CapsuleOrder) {
     `Delivery address: ${order.deliveryAddress}`,
     `City: ${order.city}`,
     `Postal code: ${order.postalCode || "-"}`,
+    `Country: ${order.deliveryCountry}`,
+    "Delivery time: 3–5 business days",
     `Payment method: Cash on delivery`,
     `Payment status: ${order.paymentStatus}`,
     `Note: ${order.note || "-"}`,

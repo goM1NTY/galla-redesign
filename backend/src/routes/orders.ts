@@ -38,6 +38,12 @@ const espressoInquirySchema = z.object({
 
 export const ordersRouter = Router();
 
+const configuredEurToMkdRate = Number(process.env.EUR_TO_MKD_RATE || 61.5);
+const EUR_TO_MKD_RATE =
+  Number.isFinite(configuredEurToMkdRate) && configuredEurToMkdRate > 0 ? configuredEurToMkdRate : 61.5;
+const SHIPPING_MKD_CENTS = 12_000;
+const FREE_SHIPPING_MKD_CENTS = 215_000;
+
 ordersRouter.post("/capsules", async (req, res) => {
   const parsed = capsuleOrderSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -78,7 +84,7 @@ ordersRouter.post("/capsules", async (req, res) => {
 
   const pricedItems = parsed.data.items.map((item) => {
     const product = productsByCode.get(item.productId)!;
-    const unitPriceCents = Math.round(product.priceEur! * 100);
+    const unitPriceCents = Math.round(product.priceEur! * EUR_TO_MKD_RATE) * 100;
     return {
       productId: product.id,
       productCode: product.code,
@@ -89,7 +95,7 @@ ordersRouter.post("/capsules", async (req, res) => {
     };
   });
   const subtotalCents = pricedItems.reduce((sum, item) => sum + item.lineTotalCents, 0);
-  const shippingCents = subtotalCents >= 3500 ? 0 : 390;
+  const shippingCents = subtotalCents >= FREE_SHIPPING_MKD_CENTS ? 0 : SHIPPING_MKD_CENTS;
   const totalCents = subtotalCents + shippingCents;
   const orderNumber = `GALLA-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${randomBytes(3)
     .toString("hex")
@@ -104,12 +110,14 @@ ordersRouter.post("/capsules", async (req, res) => {
       deliveryAddress: parsed.data.deliveryAddress,
       city: parsed.data.city,
       postalCode: parsed.data.postalCode,
+      deliveryCountry: "North Macedonia",
       paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
       paymentStatus: PaymentStatus.PENDING,
       subtotalCents,
       shippingCents,
       totalCents,
-      currency: "EUR",
+      currency: "MKD",
+      eurToMkdRate: EUR_TO_MKD_RATE,
       note: parsed.data.note,
       items: {
         create: pricedItems.map((item) => ({
@@ -130,12 +138,14 @@ ordersRouter.post("/capsules", async (req, res) => {
       deliveryAddress: order.deliveryAddress!,
       city: order.city!,
       postalCode: order.postalCode ?? undefined,
+      deliveryCountry: order.deliveryCountry,
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
       subtotalCents,
       shippingCents,
       totalCents,
-      currency: "EUR",
+      currency: "MKD",
+      eurToMkdRate: EUR_TO_MKD_RATE,
       note: order.note ?? undefined,
       items: pricedItems.map(({ productCode, productName, quantity, unitPriceCents, lineTotalCents }) => ({
         productId: productCode,
@@ -168,12 +178,14 @@ ordersRouter.post("/capsules", async (req, res) => {
     deliveryAddress: order.deliveryAddress,
     city: order.city,
     postalCode: order.postalCode,
+    deliveryCountry: order.deliveryCountry,
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     subtotalCents: order.subtotalCents,
     shippingCents: order.shippingCents,
     totalCents: order.totalCents,
     currency: order.currency,
+    eurToMkdRate: order.eurToMkdRate,
     note: order.note,
     items: pricedItems.map(({ productCode, productName, quantity, unitPriceCents, lineTotalCents }) => ({
       productId: productCode,
