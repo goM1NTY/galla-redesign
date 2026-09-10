@@ -7,6 +7,13 @@ interface ApiResponse<T> {
   emailSent?: boolean;
 }
 
+interface CapsuleOrderResponse {
+  orderNumber: string;
+  customerEmail: string;
+  totalCents: number;
+  currency: string;
+}
+
 async function request<T>(path: string, init: RequestInit): Promise<ApiResponse<T>> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -47,7 +54,7 @@ export function placeCapsuleOrder(payload: {
   note?: string;
   items: Array<{ productId: string; quantity: number }>;
 }) {
-  return request("/orders/capsules", {
+  return request<CapsuleOrderResponse>("/orders/capsules", {
     method: "POST",
     body: JSON.stringify(payload),
   });

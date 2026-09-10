@@ -7,7 +7,7 @@ const MAIL_TO = process.env.MAIL_TO || "minetamexhiti01@gmail.com";
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-async function sendEmail(subject: string, text: string) {
+async function sendEmail(to: string, subject: string, text: string) {
   if (!resend) {
     console.warn("Email skipped: RESEND_API_KEY is not configured");
     return { sent: false, reason: "missing_api_key" as const };
@@ -15,7 +15,7 @@ async function sendEmail(subject: string, text: string) {
 
   await resend.emails.send({
     from: MAIL_FROM,
-    to: [MAIL_TO],
+    to: [to],
     subject,
     text,
   });
@@ -35,10 +35,10 @@ export async function sendContactNotification(message: ContactMessage) {
     `Created At: ${message.createdAt}`,
   ].join("\n");
 
-  return sendEmail(subject, text);
+  return sendEmail(MAIL_TO, subject, text);
 }
 
-export async function sendCapsuleOrderNotification(order: CapsuleOrder) {
+function formatCapsuleOrder(order: CapsuleOrder) {
   const formatMoney = (cents: number) => `${order.currency} ${(cents / 100).toFixed(2)}`;
   const itemsText = order.items
     .map(
@@ -47,10 +47,8 @@ export async function sendCapsuleOrderNotification(order: CapsuleOrder) {
         `(${formatMoney(item.unitPriceCents)} each)`,
     )
     .join("\n");
-  const subject = `[Galla Website] Capsules Order: ${order.customerName}`;
-  const text = [
-    "A new capsules order was submitted.",
-    "",
+  return [
+    `Order number: ${order.orderNumber}`,
     `Customer: ${order.customerName}`,
     `Email: ${order.customerEmail}`,
     `Phone: ${order.customerPhone}`,
@@ -67,8 +65,30 @@ export async function sendCapsuleOrderNotification(order: CapsuleOrder) {
     `Total: ${formatMoney(order.totalCents)}`,
     `Created At: ${order.createdAt}`,
   ].join("\n");
+}
 
-  return sendEmail(subject, text);
+export function sendCapsuleOrderNotification(order: CapsuleOrder) {
+  const subject = `[Galla Website] Order ${order.orderNumber}: ${order.customerName}`;
+  const text = ["A new capsules order was submitted.", "", formatCapsuleOrder(order)].join("\n");
+
+  return sendEmail(MAIL_TO, subject, text);
+}
+
+export function sendCapsuleOrderConfirmation(order: CapsuleOrder) {
+  const subject = `Galla order confirmation — ${order.orderNumber}`;
+  const text = [
+    `Hello ${order.customerName},`,
+    "",
+    "Thank you for your order. We have received it successfully.",
+    "Payment is due in cash when your order is delivered.",
+    "",
+    formatCapsuleOrder(order),
+    "",
+    "Please keep this email for your records.",
+    "Galla Caffe",
+  ].join("\n");
+
+  return sendEmail(order.customerEmail, subject, text);
 }
 
 export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) {
@@ -84,5 +104,5 @@ export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) 
     `Created At: ${inquiry.createdAt}`,
   ].join("\n");
 
-  return sendEmail(subject, text);
+  return sendEmail(MAIL_TO, subject, text);
 }

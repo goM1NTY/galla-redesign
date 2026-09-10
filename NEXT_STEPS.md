@@ -6,7 +6,7 @@
 
 3. [x] **Calculate totals on the backend.** Product prices now come from the database; the backend calculates shipping and saves immutable unit prices, line totals, subtotal, shipping, final total, and currency with each order.
 
-4. [ ] **Add order confirmation.** Show an order number after checkout and email the customer their items, total, delivery address, payment method, and order status.
+4. [x] **Add order confirmation.** Checkout now shows a persistent order number and total, and the customer receives an email with their items, total, delivery address, payment method, and order status.
 
 5. [ ] **Add order management.** Create a protected admin view where Galla can see orders and update them to `CONFIRMED`, `SHIPPED`, `DELIVERED`, or `CANCELLED`.
 

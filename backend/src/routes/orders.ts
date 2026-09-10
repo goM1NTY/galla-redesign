@@ -1,9 +1,11 @@
 import { Router } from "express";
+import { randomBytes } from "node:crypto";
 import { PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import {
   sendCapsuleOrderNotification,
+  sendCapsuleOrderConfirmation,
   sendEspressoInquiryNotification,
 } from "../services/email.js";
 
@@ -89,9 +91,13 @@ ordersRouter.post("/capsules", async (req, res) => {
   const subtotalCents = pricedItems.reduce((sum, item) => sum + item.lineTotalCents, 0);
   const shippingCents = subtotalCents >= 3500 ? 0 : 390;
   const totalCents = subtotalCents + shippingCents;
+  const orderNumber = `GALLA-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${randomBytes(3)
+    .toString("hex")
+    .toUpperCase()}`;
 
   const order = await prisma.order.create({
     data: {
+      orderNumber,
       customerName: parsed.data.customerName,
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
@@ -115,10 +121,9 @@ ordersRouter.post("/capsules", async (req, res) => {
       },
     },
   });
-  let emailSent = false;
-  try {
-    const emailResult = await sendCapsuleOrderNotification({
+  const emailOrder = {
       id: order.id,
+      orderNumber: order.orderNumber!,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
       customerPhone: order.customerPhone!,
@@ -140,14 +145,23 @@ ordersRouter.post("/capsules", async (req, res) => {
         lineTotalCents,
       })),
       createdAt: order.createdAt.toISOString(),
-    });
-    emailSent = emailResult.sent;
-  } catch (error) {
-    console.error("Failed to send capsule order notification", error);
+  };
+  const [notificationResult, confirmationResult] = await Promise.allSettled([
+    sendCapsuleOrderNotification(emailOrder),
+    sendCapsuleOrderConfirmation(emailOrder),
+  ]);
+  const notificationEmailSent = notificationResult.status === "fulfilled" && notificationResult.value.sent;
+  const confirmationEmailSent = confirmationResult.status === "fulfilled" && confirmationResult.value.sent;
+  if (notificationResult.status === "rejected") {
+    console.error("Failed to send capsule order notification", notificationResult.reason);
+  }
+  if (confirmationResult.status === "rejected") {
+    console.error("Failed to send customer order confirmation", confirmationResult.reason);
   }
 
   const responseData = {
     id: order.id,
+    orderNumber: order.orderNumber,
     customerName: order.customerName,
     customerEmail: order.customerEmail,
     customerPhone: order.customerPhone,
@@ -173,7 +187,9 @@ ordersRouter.post("/capsules", async (req, res) => {
 
   return res.status(201).json({
     success: true,
-    emailSent,
+    emailSent: notificationEmailSent,
+    notificationEmailSent,
+    confirmationEmailSent,
     data: responseData,
   });
 });

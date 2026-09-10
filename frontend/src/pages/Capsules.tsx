@@ -133,6 +133,9 @@ const capsuleTranslations = {
     submitting: "Submitting...",
     placeOrder: "Place Order",
     orderSuccess: "Order placed successfully. Payment is due in cash on delivery.",
+    confirmationTitle: "Order Confirmed",
+    orderNumber: "Order number",
+    confirmationEmail: "A confirmation email was sent to",
     orderFailed: "Failed to send order.",
     freeShippingNote: "Free shipping above EUR 35. Orders are prepared within 24 hours.",
     ordersSubmittedApi: "Orders are submitted directly to the backend API.",
@@ -187,6 +190,9 @@ const capsuleTranslations = {
     submitting: "Duke dërguar...",
     placeOrder: "Bëj Porosinë",
     orderSuccess: "Porosia u bë me sukses. Pagesa bëhet me para në dorëzim.",
+    confirmationTitle: "Porosia u Konfirmua",
+    orderNumber: "Numri i porosisë",
+    confirmationEmail: "Një email konfirmimi u dërgua te",
     orderFailed: "Dërgimi i porosisë dështoi.",
     freeShippingNote: "Transport falas mbi EUR 35. Porositë përgatiten brenda 24 orëve.",
     ordersSubmittedApi: "Porositë dërgohen direkt në backend API.",
@@ -241,6 +247,9 @@ const capsuleTranslations = {
     submitting: "Се испраќа...",
     placeOrder: "Нарачај",
     orderSuccess: "Нарачката е успешно направена. Плаќањето е во готово при достава.",
+    confirmationTitle: "Нарачката е Потврдена",
+    orderNumber: "Број на нарачка",
+    confirmationEmail: "Е-пошта за потврда е испратена до",
     orderFailed: "Неуспешно испраќање на нарачка.",
     freeShippingNote: "Бесплатна достава над EUR 35. Нарачките се подготвуваат за 24 часа.",
     ordersSubmittedApi: "Нарачките се испраќаат директно до backend API.",
@@ -308,6 +317,12 @@ const Capsules = () => {
   });
   const [orderSubmitState, setOrderSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [orderSubmitMessage, setOrderSubmitMessage] = useState("");
+  const [confirmedOrder, setConfirmedOrder] = useState<{
+    orderNumber: string;
+    customerEmail: string;
+    totalCents: number;
+    currency: string;
+  } | null>(null);
   const [espressoForm, setEspressoForm] = useState({
     customerName: "",
     customerEmail: "",
@@ -417,6 +432,7 @@ const Capsules = () => {
   }, []);
 
   const increaseCapsule = (id: string) => {
+    setConfirmedOrder(null);
     setCapsuleQty((prev) => ({ ...prev, [id]: prev[id] + 1 }));
   };
 
@@ -434,7 +450,7 @@ const Capsules = () => {
     setOrderSubmitState("loading");
     setOrderSubmitMessage("");
     try {
-      await placeCapsuleOrder({
+      const result = await placeCapsuleOrder({
         customerName: orderForm.customerName,
         customerEmail: orderForm.customerEmail,
         customerPhone: orderForm.customerPhone,
@@ -449,8 +465,13 @@ const Capsules = () => {
         })),
       });
 
+      if (!result.data) {
+        throw new Error(t.orderFailed);
+      }
+
       setOrderSubmitState("success");
       setOrderSubmitMessage(t.orderSuccess);
+      setConfirmedOrder(result.data);
       setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
       setOrderForm({
         customerName: "",
@@ -515,6 +536,25 @@ const Capsules = () => {
             {t.intro}
           </p>
         </div>
+
+        {confirmedOrder && (
+          <section
+            aria-live="polite"
+            className="mx-auto mt-10 max-w-2xl rounded-[12px] border border-green-300 bg-green-50 px-5 py-6 text-center shadow-sm"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-green-800">{t.confirmationTitle}</p>
+            <p className="mt-2 text-lg font-bold text-[#1f1f1f]">
+              {t.orderNumber}: {confirmedOrder.orderNumber}
+            </p>
+            <p className="mt-2 text-sm text-[#3f4f43]">{t.orderSuccess}</p>
+            <p className="mt-1 text-sm text-[#3f4f43]">
+              {t.total}: {confirmedOrder.currency} {(confirmedOrder.totalCents / 100).toFixed(2)}
+            </p>
+            <p className="mt-1 text-xs text-[#536057]">
+              {t.confirmationEmail} {confirmedOrder.customerEmail}.
+            </p>
+          </section>
+        )}
 
         <div className={`mt-12 grid grid-cols-1 gap-10 ${hasCapsuleSelection ? "lg:grid-cols-[minmax(0,7fr)_minmax(320px,3fr)]" : ""}`}>
           <div

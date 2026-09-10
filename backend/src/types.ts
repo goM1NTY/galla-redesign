@@ -28,6 +28,7 @@ export interface CapsuleOrderItem {
 
 export interface CapsuleOrder {
   id: string;
+  orderNumber: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -39,7 +40,7 @@ export interface CapsuleOrder {
   subtotalCents: number;
   shippingCents: number;
   totalCents: number;
-  currency: "EUR";
+  currency: string;
   items: CapsuleOrderItem[];
   note?: string;
   createdAt: string;
