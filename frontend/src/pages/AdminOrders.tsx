@@ -4,6 +4,7 @@ import {
   AdminProfile,
   getAdminProfile,
   saveAdminProfile,
+  loginAdmin,
   requestAdminCode,
   verifyAdminCode,
   logoutAdmin,
@@ -126,6 +127,9 @@ const AdminOrders = () => {
   const t = adminTranslations[language];
   const [adminKey, setAdminKey] = useState(() => window.sessionStorage.getItem("galla_admin_session") || "");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [setupPassword, setSetupPassword] = useState(false);
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
@@ -173,16 +177,25 @@ const AdminOrders = () => {
     setError("");
     setLoading(true);
     try {
-      if (!codeSent) {
+      if (!setupPassword) {
+        const result = await loginAdmin(email, password);
+        if (!result.data) throw new Error("Sign-in failed.");
+        setAdminKey(result.data.token);
+        await loadOrders(undefined, result.data.token);
+        setPassword("");
+      } else if (!codeSent) {
         const result = await requestAdminCode(email);
         setLoginMessage(result.data?.message || "Check your email for a sign-in code.");
         setCodeSent(true);
       } else {
-        const result = await verifyAdminCode(email, code);
+        if (password !== confirmPassword) throw new Error(language === "sq" ? "Fjalëkalimet nuk përputhen." : "Passwords do not match.");
+        const result = await verifyAdminCode(email, code, password);
         if (!result.data) throw new Error("Sign-in failed.");
         setAdminKey(result.data.token);
         await loadOrders(undefined, result.data.token);
         setCode("");
+        setPassword("");
+        setConfirmPassword("");
       }
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Sign-in failed.");
@@ -204,6 +217,9 @@ const AdminOrders = () => {
 
   const signOut = () => {
     void logoutAdmin(adminKey).catch(() => undefined);
+    setPassword("");
+    setConfirmPassword("");
+    setSetupPassword(false);
     setCodeSent(false);
     setCode("");
     setLoginMessage("");
@@ -266,7 +282,7 @@ const AdminOrders = () => {
         <form onSubmit={signIn} className="w-full max-w-md rounded-xl border border-[#dfd4ca] bg-white p-7 shadow-lg">
           <div className="flex items-center justify-between gap-4"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9e0102]">{t.internal}</p>{languageButtons}</div>
           <h1 className="mt-2 font-serif text-3xl">{t.management}</h1>
-          <p className="mt-2 text-sm text-[#62584f]">{language === "sq" ? "Hyni me emailin tuaj dhe një kod njëpërdorimësh." : "Sign in with your email and a one-time code."}</p>
+          <p className="mt-2 text-sm text-[#62584f]">{language === "sq" ? "Hyni me emailin dhe fjalëkalimin tuaj." : "Sign in with your email and password. Set up your password once using an email code."}</p>
           <label className="mt-6 block text-sm font-semibold" htmlFor="admin-email">Email</label>
           <input id="admin-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required disabled={codeSent} className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3 outline-none focus:border-[#9e0102]" />
           {codeSent && <>
@@ -274,10 +290,20 @@ const AdminOrders = () => {
             <input id="admin-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3 outline-none focus:border-[#9e0102]" />
             <p className="mt-3 text-sm text-[#62584f]" role="status">{loginMessage}</p>
           </>}
+          {(!setupPassword || codeSent) && <>
+            <label className="mt-4 block text-sm font-semibold" htmlFor="admin-password">{language === "sq" ? "Fjalëkalimi" : setupPassword ? "New password" : "Password"}</label>
+            <input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={setupPassword ? "new-password" : "current-password"} minLength={setupPassword ? 12 : 1} maxLength={128} required className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3" />
+            {setupPassword && <>
+              <p className="mt-2 text-xs text-[#62584f]">{language === "sq" ? "Të paktën 12 karaktere." : "Use at least 12 characters."}</p>
+              <label className="mt-4 block text-sm font-semibold" htmlFor="admin-confirm-password">{language === "sq" ? "Konfirmoni fjalëkalimin" : "Confirm password"}</label>
+              <input id="admin-confirm-password" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={12} maxLength={128} required className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3" />
+            </>}
+          </>}
           <button disabled={loading} className="mt-4 w-full rounded-md bg-[#9e0102] px-4 py-3 font-bold text-white disabled:opacity-60">
-            {loading ? t.checking : codeSent ? t.openOrders : language === "sq" ? "Dërgo kodin e hyrjes" : "Send sign-in code"}
+            {loading ? t.checking : !setupPassword ? t.openOrders : codeSent ? (language === "sq" ? "Ruaj fjalëkalimin dhe hyr" : "Save password and sign in") : language === "sq" ? "Dërgo kodin e hyrjes" : "Send sign-in code"}
           </button>
           {codeSent && <button type="button" className="mt-3 text-sm text-[#9e0102]" onClick={() => { setCodeSent(false); setCode(""); setError(""); }}>{language === "sq" ? "Ndryshoni emailin ose kërkoni kod të ri" : "Change email or request a new code"}</button>}
+          <button type="button" className="mt-4 block text-sm font-medium text-[#9e0102]" onClick={() => { setSetupPassword(!setupPassword); setCodeSent(false); setCode(""); setPassword(""); setConfirmPassword(""); setError(""); setLoginMessage(""); }}>{setupPassword ? (language === "sq" ? "Kthehu te hyrja me fjalëkalim" : "Back to password sign-in") : (language === "sq" ? "Vendos ose rivendos fjalëkalimin" : "Set up or reset password")}</button>
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
           <Link to="/" className="mt-5 block text-center text-sm text-[#9e0102] hover:underline">{t.back}</Link>
         </form>
@@ -288,7 +314,7 @@ const AdminOrders = () => {
   return (
     <div className="min-h-screen bg-[#f7f4f1] text-[#1f1f1f]">
       <header className="bg-[#9e0102] text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-5 md:px-6">
           <div><p className="text-xs uppercase tracking-[0.18em] text-[#ffd7d1]">{t.internal}</p><h1 className="font-serif text-2xl">{t.orders}</h1></div>
           <div className="flex flex-wrap items-center justify-end gap-2"><a href="#my-profile" className="mr-2 flex items-center gap-2 rounded-md border border-white/30 px-3 py-2"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-[#9e0102]">{(profile?.name || profile?.email || "A").split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()}</span><span className="text-left"><span className="block text-sm font-semibold">{profile?.name || profile?.email}</span><span className="block text-xs text-white/80">{language === "sq" ? "Administratori" : "Administrator"}</span></span></a>{languageButtons}<button onClick={() => loadOrders()} className="rounded-md border border-white/40 px-3 py-2 text-sm">{t.refresh}</button><button onClick={signOut} className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-[#9e0102]">{t.signOut}</button></div>
         </div>

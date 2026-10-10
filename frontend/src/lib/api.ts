@@ -161,8 +161,8 @@ export function updateAdminProductInventory(
 export function requestAdminCode(email: string) {
   return request<{ message: string }>("/admin/request-code", { method: "POST", body: JSON.stringify({ email }) });
 }
-export function verifyAdminCode(email: string, code: string) {
-  return request<{ token: string; email: string }>("/admin/verify-code", { method: "POST", body: JSON.stringify({ email, code }) });
+export function verifyAdminCode(email: string, code: string, password: string) {
+  return request<{ token: string; email: string }>("/admin/verify-code", { method: "POST", body: JSON.stringify({ email, code, password }) });
 }
 export function logoutAdmin(token: string) {
   return request<never>("/admin/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
@@ -174,4 +174,8 @@ export function getAdminProfile(token: string) {
 }
 export function saveAdminProfile(token: string, name: string) {
   return request<AdminProfile>("/admin/profile", { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ name }) });
+}
+
+export function loginAdmin(email: string, password: string) {
+  return request<{ token: string; email: string }>("/admin/login", { method: "POST", body: JSON.stringify({ email, password }) });
 }

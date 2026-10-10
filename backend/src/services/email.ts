@@ -121,5 +121,5 @@ export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) 
 }
 
 export function sendAdminLoginCode(email: string, code: string) {
-  return sendEmail(email, "Your Galla admin sign-in code", `Your Galla admin sign-in code is: ${code}\n\nIt expires in 10 minutes and can only be used once. If you did not request this code, ignore this email.`);
+  return sendEmail(email, "Your Galla admin password setup code", `Your Galla admin password setup code is: ${code}\n\nIt expires in 10 minutes and can only be used once. If you did not request this code, ignore this email.`);
 }
