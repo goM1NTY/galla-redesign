@@ -4,11 +4,12 @@ import type { CapsuleOrder, ContactMessage, EspressoInquiry } from "../types.js"
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const MAIL_FROM = process.env.MAIL_FROM || "onboarding@resend.dev";
-const MAIL_TO = process.env.MAIL_TO || "minetamexhiti01@gmail.com";
+const MAIL_TO = [...new Set((process.env.MAIL_TO || "minetamexhiti01@gmail.com")
+  .split(",").map((email) => email.trim()).filter(Boolean))];
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-async function sendEmail(to: string, subject: string, text: string, richEmail?: ReturnType<typeof buildOrderConfirmation>) {
+async function sendEmail(to: string | string[], subject: string, text: string, richEmail?: ReturnType<typeof buildOrderConfirmation>) {
   if (!resend) {
     console.warn("Email skipped: RESEND_API_KEY is not configured");
     return { sent: false, reason: "missing_api_key" as const };
@@ -16,11 +17,11 @@ async function sendEmail(to: string, subject: string, text: string, richEmail?: 
 
   const result = await resend.emails.send({
     from: MAIL_FROM,
-    to: [to],
+    to: typeof to === "string" ? [to] : to,
     subject,
     text,
     ...(richEmail || {}),
-    replyTo: MAIL_TO,
+    replyTo: process.env.MAIL_REPLY_TO?.trim() || MAIL_TO[0],
   });
 
   if (result.error) throw new Error(`Email could not be sent: ${result.error.message}`);
@@ -115,4 +116,8 @@ export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) 
   ].join("\n");
 
   return sendEmail(MAIL_TO, subject, text);
+}
+
+export function sendAdminLoginCode(email: string, code: string) {
+  return sendEmail(email, "Your Galla admin sign-in code", `Your Galla admin sign-in code is: ${code}\n\nIt expires in 10 minutes and can only be used once. If you did not request this code, ignore this email.`);
 }

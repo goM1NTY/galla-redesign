@@ -126,14 +126,14 @@ export function getProducts() {
 export function getAdminOrders(adminKey: string) {
   return request<AdminOrder[]>("/orders/admin", {
     method: "GET",
-    headers: { "x-admin-key": adminKey },
+    headers: { Authorization: `Bearer ${adminKey}` },
   });
 }
 
 export function updateAdminOrderStatus(adminKey: string, orderId: string, status: FulfillmentStatus) {
   return request<AdminOrder>(`/orders/admin/${orderId}/status`, {
     method: "PATCH",
-    headers: { "x-admin-key": adminKey },
+    headers: { Authorization: `Bearer ${adminKey}` },
     body: JSON.stringify({ status }),
   });
 }
@@ -141,7 +141,7 @@ export function updateAdminOrderStatus(adminKey: string, orderId: string, status
 export function getAdminProducts(adminKey: string) {
   return request<AdminProduct[]>("/products/admin", {
     method: "GET",
-    headers: { "x-admin-key": adminKey },
+    headers: { Authorization: `Bearer ${adminKey}` },
   });
 }
 
@@ -153,7 +153,17 @@ export function updateAdminProductInventory(
 ) {
   return request<AdminProduct>(`/products/admin/${productCode}/inventory`, {
     method: "PATCH",
-    headers: { "x-admin-key": adminKey },
+    headers: { Authorization: `Bearer ${adminKey}` },
     body: JSON.stringify({ stockQuantity, inStock }),
   });
+}
+
+export function requestAdminCode(email: string) {
+  return request<{ message: string }>("/admin/request-code", { method: "POST", body: JSON.stringify({ email }) });
+}
+export function verifyAdminCode(email: string, code: string) {
+  return request<{ token: string; email: string }>("/admin/verify-code", { method: "POST", body: JSON.stringify({ email, code }) });
+}
+export function logoutAdmin(token: string) {
+  return request<never>("/admin/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
 }

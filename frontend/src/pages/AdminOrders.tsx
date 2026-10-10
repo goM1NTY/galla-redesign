@@ -1,6 +1,9 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  requestAdminCode,
+  verifyAdminCode,
+  logoutAdmin,
   AdminOrder,
   AdminProduct,
   FulfillmentStatus,
@@ -118,7 +121,11 @@ const AdminOrders = () => {
     window.localStorage.getItem("galla_admin_language") === "sq" ? "sq" : "en",
   );
   const t = adminTranslations[language];
-  const [adminKey, setAdminKey] = useState(() => window.sessionStorage.getItem("galla_admin_key") || "");
+  const [adminKey, setAdminKey] = useState(() => window.sessionStorage.getItem("galla_admin_session") || "");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [loginMessage, setLoginMessage] = useState("");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [stockDrafts, setStockDrafts] = useState<Record<string, string>>({});
@@ -128,24 +135,49 @@ const AdminOrders = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [updatingProductCode, setUpdatingProductCode] = useState<string | null>(null);
 
-  const loadOrders = async (event?: FormEvent) => {
+  const loadOrders = async (event?: FormEvent, token = adminKey) => {
     event?.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const [ordersResult, productsResult] = await Promise.all([getAdminOrders(adminKey), getAdminProducts(adminKey)]);
+      const [ordersResult, productsResult] = await Promise.all([getAdminOrders(token), getAdminProducts(token)]);
       const loadedProducts = productsResult.data || [];
       setOrders(ordersResult.data || []);
       setProducts(loadedProducts);
       setStockDrafts(Object.fromEntries(loadedProducts.map((product) => [product.code, product.stockQuantity?.toString() || ""])));
       setAuthenticated(true);
-      window.sessionStorage.setItem("galla_admin_key", adminKey);
+      window.sessionStorage.setItem("galla_admin_session", token);
     } catch (requestError) {
       setAuthenticated(false);
       setError(requestError instanceof Error ? requestError.message : t.loadError);
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (adminKey) void loadOrders();
+  }, []);
+
+  const signIn = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      if (!codeSent) {
+        const result = await requestAdminCode(email);
+        setLoginMessage(result.data?.message || "Check your email for a sign-in code.");
+        setCodeSent(true);
+      } else {
+        const result = await verifyAdminCode(email, code);
+        if (!result.data) throw new Error("Sign-in failed.");
+        setAdminKey(result.data.token);
+        await loadOrders(undefined, result.data.token);
+        setCode("");
+      }
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Sign-in failed.");
+    } finally { setLoading(false); }
   };
 
   const updateStatus = async (orderId: string, status: FulfillmentStatus) => {
@@ -162,7 +194,11 @@ const AdminOrders = () => {
   };
 
   const signOut = () => {
-    window.sessionStorage.removeItem("galla_admin_key");
+    void logoutAdmin(adminKey).catch(() => undefined);
+    setCodeSent(false);
+    setCode("");
+    setLoginMessage("");
+    window.sessionStorage.removeItem("galla_admin_session");
     setAdminKey("");
     setOrders([]);
     setProducts([]);
@@ -215,23 +251,21 @@ const AdminOrders = () => {
   if (!authenticated) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f7f4f1] px-4">
-        <form onSubmit={loadOrders} className="w-full max-w-md rounded-xl border border-[#dfd4ca] bg-white p-7 shadow-lg">
+        <form onSubmit={signIn} className="w-full max-w-md rounded-xl border border-[#dfd4ca] bg-white p-7 shadow-lg">
           <div className="flex items-center justify-between gap-4"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9e0102]">{t.internal}</p>{languageButtons}</div>
           <h1 className="mt-2 font-serif text-3xl">{t.management}</h1>
-          <p className="mt-2 text-sm text-[#62584f]">{t.enterKey}</p>
-          <label className="mt-6 block text-sm font-semibold" htmlFor="admin-key">{t.adminKey}</label>
-          <input
-            id="admin-key"
-            type="password"
-            value={adminKey}
-            onChange={(event) => setAdminKey(event.target.value)}
-            autoComplete="current-password"
-            required
-            className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3 outline-none focus:border-[#9e0102]"
-          />
+          <p className="mt-2 text-sm text-[#62584f]">{language === "sq" ? "Hyni me emailin tuaj dhe një kod njëpërdorimësh." : "Sign in with your email and a one-time code."}</p>
+          <label className="mt-6 block text-sm font-semibold" htmlFor="admin-email">Email</label>
+          <input id="admin-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required disabled={codeSent} className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3 outline-none focus:border-[#9e0102]" />
+          {codeSent && <>
+            <label className="mt-4 block text-sm font-semibold" htmlFor="admin-code">{language === "sq" ? "Kodi i hyrjes" : "Sign-in code"}</label>
+            <input id="admin-code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-3 outline-none focus:border-[#9e0102]" />
+            <p className="mt-3 text-sm text-[#62584f]" role="status">{loginMessage}</p>
+          </>}
           <button disabled={loading} className="mt-4 w-full rounded-md bg-[#9e0102] px-4 py-3 font-bold text-white disabled:opacity-60">
-            {loading ? t.checking : t.openOrders}
+            {loading ? t.checking : codeSent ? t.openOrders : language === "sq" ? "Dërgo kodin e hyrjes" : "Send sign-in code"}
           </button>
+          {codeSent && <button type="button" className="mt-3 text-sm text-[#9e0102]" onClick={() => { setCodeSent(false); setCode(""); setError(""); }}>{language === "sq" ? "Ndryshoni emailin ose kërkoni kod të ri" : "Change email or request a new code"}</button>}
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
           <Link to="/" className="mt-5 block text-center text-sm text-[#9e0102] hover:underline">{t.back}</Link>
         </form>

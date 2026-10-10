@@ -120,3 +120,23 @@ enum FulfillmentStatus {
   DELIVERED
   CANCELLED
 }
+
+model AdminUser {
+  id String @id @default(cuid())
+  email String @unique
+  active Boolean @default(true)
+  codeHash String?
+  codeExpiresAt DateTime?
+  codeAttempts Int @default(0)
+  codeRequestedAt DateTime?
+  sessions AdminSession[]
+  @@map("admin_users")
+}
+model AdminSession {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  expiresAt DateTime
+  userId String
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("admin_sessions")
+}

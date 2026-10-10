@@ -7,6 +7,8 @@ import { productsRouter } from "./routes/products.js";
 import { ensureSeedProducts } from "./services/bootstrap.js";
 import { prisma } from "./lib/prisma.js";
 
+import { adminRouter } from "./routes/admin.js";
+
 const app = express();
 const port = Number(process.env.PORT || 4000);
 
@@ -17,6 +19,7 @@ app.get("/health", (_req, res) => {
   res.json({ success: true, status: "ok" });
 });
 
+app.use("/admin", adminRouter);
 app.use("/contact", contactRouter);
 app.use("/orders", ordersRouter);
 app.use("/products", productsRouter);
