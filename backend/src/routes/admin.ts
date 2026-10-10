@@ -23,6 +23,9 @@ adminRouter.post("/request-code", async (req, res) => {
   const parsed = emailSchema.safeParse(req.body.email);
   if (!parsed.success) return res.status(400).json({ success: false, error: "Enter a valid email address." });
   const user = await prisma.adminUser.findUnique({ where: { email: parsed.data } });
+  if (user?.active && user.codeRequestedAt && Date.now() - user.codeRequestedAt.getTime() < 60000) {
+    return res.status(429).json({ success: false, error: "Please wait one minute before requesting another code. Use the most recent email." });
+  }
   if (user?.active && (!user.codeRequestedAt || Date.now() - user.codeRequestedAt.getTime() >= 60000)) {
     const code = randomInt(100000, 1000000).toString();
     const claimed = await prisma.adminUser.updateMany({ where: { id: user.id, OR: [{ codeRequestedAt: null }, { codeRequestedAt: { lt: new Date(Date.now() - 60000) } }] }, data: { codeHash: hashAdminToken(code), codeExpiresAt: new Date(Date.now() + 600000), codeAttempts: 0, codeRequestedAt: new Date() } });
@@ -36,7 +39,7 @@ adminRouter.post("/request-code", async (req, res) => {
 });
 adminRouter.post("/verify-code", async (req, res) => {
  try {
-  const parsed = z.object({ email: emailSchema, code: z.string().regex(/^\d{6}$/), password: passwordSchema }).safeParse(req.body);
+  const parsed = z.object({ email: emailSchema, code: z.string().trim().regex(/^\d{6}$/), password: passwordSchema }).safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ success: false, error: "Enter your email, six-digit code, and a password of 12–128 characters." });
   const user = await prisma.adminUser.findUnique({ where: { email: parsed.data.email } });
   if (!user?.active || !user.codeExpiresAt || user.codeExpiresAt.getTime() <= Date.now() || user.codeAttempts >= 5) return res.status(401).json({ success: false, error: "Invalid or expired code. Request a new code." });

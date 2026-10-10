@@ -98,6 +98,11 @@ const espressoProducts = [
 ];
 
 const CART_STORAGE_KEY = "galla_capsules_cart";
+const ORDER_DRAFT_STORAGE_KEY = "galla_order_draft";
+const EMPTY_ORDER_FORM = {
+  customerName: "", customerEmail: "", customerPhone: "",
+  deliveryAddress: "", city: "", postalCode: "", note: "",
+};
 const SHIPPING_MKD = 120;
 const FREE_SHIPPING_MKD = 2150;
 const toMkd = (eur: number) => Math.round(eur * EUR_TO_MKD_RATE);
@@ -363,14 +368,15 @@ const Capsules = () => {
   const shippingFeeMkd = totalCapsulePacks === 0 ? 0 : capsuleTotalMkd >= FREE_SHIPPING_MKD ? 0 : SHIPPING_MKD;
   const finalTotalMkd = capsuleTotalMkd + shippingFeeMkd;
   const hasCapsuleSelection = totalCapsulePacks > 0;
-  const [orderForm, setOrderForm] = useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    deliveryAddress: "",
-    city: "",
-    postalCode: "",
-    note: "",
+  const [orderForm, setOrderForm] = useState(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(ORDER_DRAFT_STORAGE_KEY) || "null");
+      return Object.fromEntries(Object.entries(EMPTY_ORDER_FORM).map(([key, value]) =>
+        [key, typeof saved?.[key] === "string" ? saved[key] : value],
+      )) as typeof EMPTY_ORDER_FORM;
+    } catch {
+      return { ...EMPTY_ORDER_FORM };
+    }
   });
   const [orderSubmitState, setOrderSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [orderSubmitMessage, setOrderSubmitMessage] = useState("");
@@ -394,8 +400,20 @@ const Capsules = () => {
   const [espressoSubmitMessage, setEspressoSubmitMessage] = useState("");
 
   useEffect(() => {
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(capsuleQty));
+    if (Object.values(capsuleQty).some((quantity) => quantity > 0)) {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(capsuleQty));
+    } else {
+      window.localStorage.removeItem(CART_STORAGE_KEY);
+    }
   }, [capsuleQty]);
+
+  useEffect(() => {
+    if (Object.values(orderForm).some((value) => value !== "")) {
+      window.localStorage.setItem(ORDER_DRAFT_STORAGE_KEY, JSON.stringify(orderForm));
+    } else {
+      window.localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+    }
+  }, [orderForm]);
 
   useEffect(() => {
     getProducts()
@@ -468,15 +486,9 @@ const Capsules = () => {
       setOrderSubmitMessage(t.orderSuccess);
       setConfirmedOrder({ ...result.data, confirmationEmailSent: result.confirmationEmailSent === true });
       setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
-      setOrderForm({
-        customerName: "",
-        customerEmail: "",
-        customerPhone: "",
-        deliveryAddress: "",
-        city: "",
-        postalCode: "",
-        note: "",
-      });
+      window.localStorage.removeItem(CART_STORAGE_KEY);
+      window.localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+      setOrderForm({ ...EMPTY_ORDER_FORM });
       setAcceptedPolicies(false);
     } catch (error) {
       setOrderSubmitState("error");
