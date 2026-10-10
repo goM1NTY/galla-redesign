@@ -50,14 +50,14 @@ const policyContent: Record<PolicyType, { title: string; intro: string; sections
       ["Returns", ["Where the statutory withdrawal right applies, notify us within 14 days of receiving the order. Products must be unused, unopened, in their original packaging and suitable for resale. Legal exceptions may apply to opened sealed goods for health or hygiene reasons and goods that deteriorate rapidly."]],
       ["Incorrect, damaged or defective goods", ["Contact us as soon as possible with your order number, a description of the issue and photographs where helpful. If we confirm an incorrect, damaged or defective product, The Galla Caffe team will arrange an appropriate replacement, refund or other legal remedy and cover reasonable return costs."]],
       ["Refunds", ["Approved refunds are processed after the returned goods are received and checked. For cash-on-delivery orders, we will agree a suitable refund method with the customer. Processing time can depend on the selected method."]],
-      ["How to request a return", ["Email info@gallacaffe.com or call +389 71 224 557. Include your order number and do not send goods back until return instructions are provided."]],
+      ["How to request a return", ["Email info@gallacaffe.com or call +389 72 234 706. Include your order number and do not send goods back until return instructions are provided."]],
     ],
   },
   company: {
     title: "Company & Legal Details",
     intro: "Business contact details and information for customer enquiries and complaints.",
     sections: [
-      ["Trading details", ["Trading name: Galla Caffe", "Address: North Macedonia", "Email: info@gallacaffe.com", "Telephone: +389 71 224 557"]],
+      ["Trading details", ["Trading name: Galla Caffe", "Address: North Macedonia", "Email: info@gallacaffe.com", "Telephone: +389 72 234 706"]],
       ["Customer complaints procedure", ["Submit complaints to info@gallacaffe.com, including your name, contact details, order number where applicable, and a clear description of the issue. Please attach relevant photographs or supporting documents where helpful. We will acknowledge receipt and review the information provided as soon as reasonably possible. If further details are required, we will contact you using the contact information supplied."]],
     ],
   },

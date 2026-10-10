@@ -33,7 +33,7 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
   return (
     <header className="relative bg-[#9e0102] text-white">
       <LogoBackgroundFilter />
-      <div className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-1.5 pt-3.5 md:pt-4">
+      <div className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-2 pt-10 sm:pt-4">
         <div className="absolute right-4 top-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em] md:right-6 md:text-xs">
           <button
             type="button"

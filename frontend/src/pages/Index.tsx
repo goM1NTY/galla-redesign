@@ -539,7 +539,7 @@ const Index = () => {
               </address>
 
               <div className="mt-8 space-y-3 border-t border-white/25 pt-6 text-lg tabular-nums">
-                <a href="tel:+38971224557" className="block w-fit underline-offset-4 transition-opacity hover:underline hover:opacity-80">+389 71 224 557</a>
+                <a href="tel:+38972234706" className="block w-fit underline-offset-4 transition-opacity hover:underline hover:opacity-80">+389 72 234 706</a>
                 <a href="mailto:info@gallacaffe.com" className="block w-fit break-all underline-offset-4 transition-opacity hover:underline hover:opacity-80">info@gallacaffe.com</a>
               </div>
             </div>
