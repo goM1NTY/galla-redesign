@@ -7,6 +7,8 @@ const MAIL_FROM = process.env.MAIL_FROM || "onboarding@resend.dev";
 const MAIL_TO = [...new Set((process.env.MAIL_TO || "minetamexhiti01@gmail.com")
   .split(",").map((email) => email.trim()).filter(Boolean))];
 
+const CONTACT_MAIL_TO = process.env.CONTACT_MAIL_TO?.trim() || "gallacaffe.contact@gmail.com";
+
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 async function sendEmail(to: string | string[], subject: string, text: string, richEmail?: ReturnType<typeof buildOrderConfirmation>) {
@@ -21,7 +23,7 @@ async function sendEmail(to: string | string[], subject: string, text: string, r
     subject,
     text,
     ...(richEmail || {}),
-    replyTo: process.env.MAIL_REPLY_TO?.trim() || MAIL_TO[0],
+    replyTo: process.env.MAIL_REPLY_TO?.trim() || CONTACT_MAIL_TO,
   });
 
   if (result.error) throw new Error(`Email could not be sent: ${result.error.message}`);
@@ -40,7 +42,7 @@ export async function sendContactNotification(message: ContactMessage) {
     `Created At: ${message.createdAt}`,
   ].join("\n");
 
-  return sendEmail(MAIL_TO, subject, text);
+  return sendEmail(CONTACT_MAIL_TO, subject, text);
 }
 
 function formatCapsuleOrder(order: CapsuleOrder) {
@@ -115,7 +117,7 @@ export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) 
     `Created At: ${inquiry.createdAt}`,
   ].join("\n");
 
-  return sendEmail(MAIL_TO, subject, text);
+  return sendEmail(CONTACT_MAIL_TO, subject, text);
 }
 
 export function sendAdminLoginCode(email: string, code: string) {

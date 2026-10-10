@@ -17,7 +17,7 @@ const policyContent: Record<PolicyType, { title: string; intro: string; sections
       ["Purposes of processing", ["Personal information is used to process and deliver orders, send order confirmations, respond to enquiries, provide customer support and prevent misuse of the website. It is also used to maintain accounting records and meet applicable legal obligations. Processing order information is necessary to fulfil the purchase contract."]],
       ["Disclosure to service providers", ["Personal information is shared with hosting, database, email and delivery providers only as necessary to provide their services. If card payments are introduced, relevant information will also be shared with the payment provider. Information may be disclosed to public authorities where required by law. We do not sell personal information or use email addresses supplied for orders for marketing without separate consent."]],
       ["Data retention and security", ["Order records are retained for as long as necessary for order fulfilment, accounting, the handling of disputes and applicable legal requirements. Enquiry records are deleted when they are no longer needed. Access controls and technical safeguards are used to protect personal information."]],
-      ["Requests concerning personal information", ["To request access to or correction of your personal information, request its deletion, or seek restriction of or object to its processing where applicable, contact minetamexhiti01@gmail.com. You may also contact the Agency for Personal Data Protection of North Macedonia."]],
+      ["Requests concerning personal information", ["To request access to or correction of your personal information, request its deletion, or seek restriction of or object to its processing where applicable, contact info@gallacaffe.com. You may also contact the Agency for Personal Data Protection of North Macedonia."]],
       ["Cookies and analytics", ["The store uses essential browser storage for the cart, language preference and consent choice. Optional Google Analytics is disabled unless you select Accept in the consent notice. If accepted, analytics helps us understand page visits and usage. You can change your choice through Privacy settings in the website footer. We do not enable advertising cookies through this control."]],
     ],
   },
@@ -29,7 +29,7 @@ const policyContent: Record<PolicyType, { title: string; intro: string; sections
       ["Prices and payment", ["Prices are displayed in EUR and MKD. The MKD amount shown in the confirmation is the cash-on-delivery amount. Cash is paid to the courier in MKD."]],
       ["Products", ["We take reasonable care to describe products accurately. Packaging and images may vary without changing the essential product. Availability may change before an order is confirmed."]],
       ["Liability", ["Nothing in these terms limits rights that cannot legally be excluded. Galla Caffe is not responsible for delays caused by events outside reasonable control, but will assist customers with affected orders."]],
-      ["Applicable law and complaints", ["These terms are governed by the laws of North Macedonia. Complaints concerning an order may be submitted to minetamexhiti01@gmail.com. Please include your order number and a description of the issue so that we can review your complaint."]],
+      ["Applicable law and complaints", ["These terms are governed by the laws of North Macedonia. Complaints concerning an order may be submitted to info@gallacaffe.com. Please include your order number and a description of the issue so that we can review your complaint."]],
     ],
   },
   shipping: {
@@ -50,15 +50,15 @@ const policyContent: Record<PolicyType, { title: string; intro: string; sections
       ["Returns", ["Where the statutory withdrawal right applies, notify us within 14 days of receiving the order. Products must be unused, unopened, in their original packaging and suitable for resale. Legal exceptions may apply to opened sealed goods for health or hygiene reasons and goods that deteriorate rapidly."]],
       ["Incorrect, damaged or defective goods", ["Contact us as soon as possible with your order number, a description of the issue and photographs where helpful. If we confirm an incorrect, damaged or defective product, The Galla Caffe team will arrange an appropriate replacement, refund or other legal remedy and cover reasonable return costs."]],
       ["Refunds", ["Approved refunds are processed after the returned goods are received and checked. For cash-on-delivery orders, we will agree a suitable refund method with the customer. Processing time can depend on the selected method."]],
-      ["How to request a return", ["Email minetamexhiti01@gmail.com or call +389 71 224 557. Include your order number and do not send goods back until return instructions are provided."]],
+      ["How to request a return", ["Email info@gallacaffe.com or call +389 71 224 557. Include your order number and do not send goods back until return instructions are provided."]],
     ],
   },
   company: {
     title: "Company & Legal Details",
     intro: "Business contact details and information for customer enquiries and complaints.",
     sections: [
-      ["Trading details", ["Trading name: Galla Caffe", "Address: North Macedonia", "Email: minetamexhiti01@gmail.com", "Telephone: +389 71 224 557"]],
-      ["Customer complaints procedure", ["Submit complaints to minetamexhiti01@gmail.com, including your name, contact details, order number where applicable, and a clear description of the issue. Please attach relevant photographs or supporting documents where helpful. We will acknowledge receipt and review the information provided as soon as reasonably possible. If further details are required, we will contact you using the contact information supplied."]],
+      ["Trading details", ["Trading name: Galla Caffe", "Address: North Macedonia", "Email: info@gallacaffe.com", "Telephone: +389 71 224 557"]],
+      ["Customer complaints procedure", ["Submit complaints to info@gallacaffe.com, including your name, contact details, order number where applicable, and a clear description of the issue. Please attach relevant photographs or supporting documents where helpful. We will acknowledge receipt and review the information provided as soon as reasonably possible. If further details are required, we will contact you using the contact information supplied."]],
     ],
   },
 };

@@ -15,7 +15,7 @@ const StoreFooter = () => (
         <div>
           <p className="font-serif text-2xl text-white">Galla Caffe</p>
           <p className="mt-2 text-sm">North Macedonia</p>
-          <p className="text-sm">minetamexhiti01@gmail.com</p>
+          <p className="text-sm">info@gallacaffe.com</p>
         </div>
         <nav aria-label="Store policies" className="flex max-w-2xl flex-wrap gap-x-5 gap-y-2 text-sm">
           {policyLinks.map(([label, path]) => (

@@ -224,7 +224,7 @@ const Index = () => {
       } else {
         productsCarouselApi.scrollTo(0);
       }
-    }, 4800);
+    }, 3900);
 
     return () => {
       window.clearInterval(intervalId);
@@ -540,7 +540,7 @@ const Index = () => {
 
               <div className="mt-8 space-y-3 border-t border-white/25 pt-6 text-lg tabular-nums">
                 <a href="tel:+38971224557" className="block w-fit underline-offset-4 transition-opacity hover:underline hover:opacity-80">+389 71 224 557</a>
-                <a href="mailto:minetamexhiti01@gmail.com" className="block w-fit break-all underline-offset-4 transition-opacity hover:underline hover:opacity-80">minetamexhiti01@gmail.com</a>
+                <a href="mailto:info@gallacaffe.com" className="block w-fit break-all underline-offset-4 transition-opacity hover:underline hover:opacity-80">info@gallacaffe.com</a>
               </div>
             </div>
 
