@@ -234,7 +234,7 @@ const Index = () => {
   useEffect(() => {
     const timerId = window.setTimeout(() => {
       setShowCapsulesPopup(true);
-    }, 600);
+    }, 5500);
 
     return () => {
       window.clearTimeout(timerId);
