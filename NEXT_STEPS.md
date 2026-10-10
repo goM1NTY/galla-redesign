@@ -30,6 +30,6 @@
 
 15. [ ] **Add operational protection.** Enable automated PostgreSQL backups, application error monitoring, API request logging, spam/rate protection for public forms, and a recovery test.
 
-16. [ ] **Improve discoverability and speed.** Add page-specific titles/descriptions, sitemap, social-sharing images, analytics with privacy consent where required, and optimize the largest product images.
+16. [x] **Improve discoverability and speed.** Page-specific titles/descriptions, canonical and social metadata, robots/sitemap files, consent-gated analytics support, and optimized WebP logo/product images are now included.
 
 17. [ ] **Run a launch acceptance test.** Test all three website languages, mobile/tablet/desktop layouts, cash checkout, emails, admin status changes, legal links, failed API states and a full production order from start to delivery.

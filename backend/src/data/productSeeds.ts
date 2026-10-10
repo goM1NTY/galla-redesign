@@ -1,12 +1,15 @@
 import { ProductCategory } from "@prisma/client";
 
+const configuredRate = Number(process.env.EUR_TO_MKD_RATE || 61.5);
+const eurToMkdRate = Number.isFinite(configuredRate) && configuredRate > 0 ? configuredRate : 61.5;
+
 export const PRODUCT_SEEDS = [
   {
     code: "capsules-classic",
     name: "Capsules Classic",
     category: ProductCategory.capsules,
-    description: "Balanced and smooth cup with soft crema.",
-    priceEur: 6.4,
+    description: "A smooth, balanced espresso with soft crema.",
+    priceEur: 200 / eurToMkdRate,
     inStock: true,
   },
   {
@@ -14,15 +17,15 @@ export const PRODUCT_SEEDS = [
     name: "Capsules Classic 50x",
     category: ProductCategory.capsules,
     description: "Classic flavor profile in a larger 50-capsule box.",
-    priceEur: 28.9,
+    priceEur: 1000 / eurToMkdRate,
     inStock: true,
   },
   {
     code: "capsules-aroma",
     name: "Capsules Aroma",
     category: ProductCategory.capsules,
-    description: "Richer fragrance with elegant aftertaste.",
-    priceEur: 6.9,
+    description: "A rich aroma with a delicate aftertaste.",
+    priceEur: 200 / eurToMkdRate,
     inStock: true,
   },
   {
@@ -30,7 +33,7 @@ export const PRODUCT_SEEDS = [
     name: "Capsules Black",
     category: ProductCategory.capsules,
     description: "Strong body with deeper roast character.",
-    priceEur: 7.2,
+    priceEur: 200 / eurToMkdRate,
     inStock: true,
   },
   {
@@ -53,7 +56,7 @@ export const PRODUCT_SEEDS = [
     code: "espresso-cream",
     name: "Galla Cream",
     category: ProductCategory.espresso,
-    description: "Middle-roast blend with creamy texture.",
+    description: "Medium-roast blend with a creamy texture.",
     priceEur: null,
     inStock: true,
   },

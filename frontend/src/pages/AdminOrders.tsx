@@ -47,7 +47,7 @@ const adminTranslations = {
     statuses: { NEW: "NEW", CONFIRMED: "CONFIRMED", SHIPPED: "SHIPPED", DELIVERED: "DELIVERED", CANCELLED: "CANCELLED" },
   },
   sq: {
-    internal: "Galla administrim",
+    internal: "Administrimi i Galla-s",
     management: "Menaxhimi i Porosive",
     enterKey: "Shkruani çelësin e administratorit për të vazhduar.",
     adminKey: "Çelësi i administratorit",
@@ -61,7 +61,7 @@ const adminTranslations = {
     orderCount: "",
     noPhone: "Pa telefon",
     note: "Shënim",
-    cash: "Pagesë me para në dorëzim",
+    cash: "Pagesë me para në dorë gjatë dorëzimit",
     orderStatus: "Statusi i porosisë",
     noOrders: "Ende nuk ka porosi.",
     notRecorded: "Nuk është regjistruar",

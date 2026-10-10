@@ -10,6 +10,8 @@ import Capsules from "./pages/Capsules";
 import NotFound from "./pages/NotFound";
 import StorePolicy from "./pages/StorePolicy";
 import AdminOrders from "./pages/AdminOrders";
+import Seo from "./components/Seo";
+import AnalyticsConsent from "./components/AnalyticsConsent";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Seo />
         <ScrollToHash />
         <Routes>
           <Route path="/" element={<Index />} />
@@ -49,6 +52,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <AnalyticsConsent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

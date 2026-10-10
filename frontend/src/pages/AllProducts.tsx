@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
 import StoreFooter from "@/components/StoreFooter";
-import classicCoffee from "@/assets/classic-coffee.png";
-import aromaCoffee from "@/assets/aroma-coffee.png";
-import creamCoffee from "@/assets/cream-coffee.png";
-import blackCoffee from "@/assets/black-coffee.png";
+import classicCoffee from "@/assets/classic-coffee.webp";
+import aromaCoffee from "@/assets/aroma-coffee.webp";
+import creamCoffee from "@/assets/cream-coffee.webp";
+import blackCoffee from "@/assets/black-coffee.webp";
 
 const AllProducts = () => {
   return (
@@ -15,9 +15,8 @@ const AllProducts = () => {
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#ffd7d1]">Galla Espresso</p>
           <h1 className="mt-2 font-serif text-4xl md:text-6xl">Galla Collection</h1>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-[#ffe8e4] md:text-base">
-            Espresso is a wonderful blending of coffees Arabica and Robusta with controlled quality, using the
-            Italian style during roasting of coffee, with our expertise and technique in the coffee industry. We
-            cannot expect anything else but sweet espresso, aromatic and very delicious.
+            Explore our Classic, Aroma, Cream, and Black espresso blends, made with selected coffee beans
+            and roasted in the Italian tradition.
           </p>
           <Link
             to="/#about"
@@ -36,12 +35,10 @@ const AllProducts = () => {
               <div>
                 <h2 className="font-serif text-3xl text-[#9e0102] md:text-4xl">Classic</h2>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  This unique mixture obtained by the combination of high quality beans of Arabica and selected beans
-                  of Robusta from the plains of South America.
+                  A blend of high-quality Arabica and selected Robusta beans from South America.
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  Longer roasted (the blackened beans) results in smooth cream-foam and an intensive espresso
-                  experience.
+                  A longer roast produces smooth crema and an intense espresso.
                 </p>
               </div>
             </div>
@@ -49,16 +46,14 @@ const AllProducts = () => {
 
           <article className="rounded-2xl border border-[#e6dbd2] bg-white p-6 shadow-sm md:p-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr] md:items-center">
-              <img src={aromaCoffee} alt="Galla Aroma Coffee" className="mx-auto h-44 w-auto object-contain" />
+              <img src={aromaCoffee} alt="Galla Aroma Coffee" loading="lazy" className="mx-auto h-44 w-auto object-contain" />
               <div>
                 <h2 className="font-serif text-3xl text-[#9e0102] md:text-4xl">Aroma</h2>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  Well defined mixture consisted of high quality Arabica and beans of Asiatic Robusta for certain
-                  coffee lovers.
+                  A blend of high-quality Arabica and Asian Robusta beans.
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  Careful quality control of the green coffee, which is middle roasted, results in perfect balance
-                  and rich mixture.
+                  Carefully selected green beans and a medium roast produce a rich, balanced espresso.
                 </p>
               </div>
             </div>
@@ -66,16 +61,14 @@ const AllProducts = () => {
 
           <article className="rounded-2xl border border-[#e6dbd2] bg-white p-6 shadow-sm md:p-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr] md:items-center">
-              <img src={creamCoffee} alt="Galla Cream Coffee" className="mx-auto h-44 w-auto object-contain" />
+              <img src={creamCoffee} alt="Galla Cream Coffee" loading="lazy" className="mx-auto h-44 w-auto object-contain" />
               <div>
                 <h2 className="font-serif text-3xl text-[#9e0102] md:text-4xl">Cream</h2>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  Well defined mixture consisted of high quality Arabica and beans of Asiatic Robusta for certain
-                  coffee lovers.
+                  A blend of high-quality Arabica and Asian Robusta beans.
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  Careful quality control of the green coffee, which is middle roasted, results in perfect balance
-                  and rich mixture.
+                  Carefully selected green beans and a medium roast produce a rich, balanced espresso.
                 </p>
               </div>
             </div>
@@ -83,16 +76,14 @@ const AllProducts = () => {
 
           <article className="rounded-2xl border border-[#e6dbd2] bg-white p-6 shadow-sm md:p-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr] md:items-center">
-              <img src={blackCoffee} alt="Galla Black Coffee" className="mx-auto h-48 w-auto object-contain" />
+              <img src={blackCoffee} alt="Galla Black Coffee" loading="lazy" className="mx-auto h-48 w-auto object-contain" />
               <div>
                 <h2 className="font-serif text-3xl text-[#9e0102] md:text-4xl">Black</h2>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  This incredible blend is made from high-quality, carefully selected beans: 100% Arabica from the
-                  plains of Brazil and Africa.
+                  A 100% Arabica blend made with carefully selected beans from Brazil and Africa.
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[#454545] md:text-base">
-                  The combination of bean origin delivers a strong flavor, complete body, and balanced acidity for a
-                  premium espresso experience.
+                  A full-bodied espresso with a rich aroma and balanced acidity.
                 </p>
               </div>
             </div>

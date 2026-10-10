@@ -14,8 +14,8 @@ const StoreFooter = () => (
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-start">
         <div>
           <p className="font-serif text-2xl text-white">Galla Caffe</p>
-          <p className="mt-2 text-sm">Ilindenska 160, Tetovo, North Macedonia</p>
-          <p className="text-sm">minetamexhiti01@gmail.com · +389 44 333 375</p>
+          <p className="mt-2 text-sm">North Macedonia</p>
+          <p className="text-sm">minetamexhiti01@gmail.com</p>
         </div>
         <nav aria-label="Store policies" className="flex max-w-2xl flex-wrap gap-x-5 gap-y-2 text-sm">
           {policyLinks.map(([label, path]) => (
@@ -23,6 +23,13 @@ const StoreFooter = () => (
               {label}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("galla:open-consent"))}
+            className="hover:underline"
+          >
+            Privacy settings
+          </button>
         </nav>
       </div>
       <p className="mt-6 border-t border-[#b95a58] pt-4 text-xs text-[#ffd7d1]">

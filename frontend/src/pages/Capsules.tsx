@@ -2,17 +2,20 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CompactHeader from "@/components/CompactHeader";
 import StoreFooter from "@/components/StoreFooter";
-import capsuleClassic10 from "@/assets/classicnew-white.png";
-import capsuleClassic50 from "@/assets/50x.jpeg";
-import capsuleAroma from "@/assets/aromanewnew-white.png";
-import classicCoffee from "@/assets/classic-coffee.png";
-import aromaCoffee from "@/assets/aroma-coffee.png";
-import creamCoffee from "@/assets/cream-coffee.png";
-import blackCoffee from "@/assets/black-coffee.png";
+import ProductImage from "@/components/ProductImage";
+import capsuleClassic10 from "@/assets/capsules-classic-10-studio.webp";
+import capsuleClassic50 from "@/assets/capsules-classic-50-studio.webp";
+import capsuleAroma from "@/assets/capsules-aroma-10-studio.webp";
+import classicCoffee from "@/assets/classic-coffee.webp";
+import aromaCoffee from "@/assets/aroma-coffee.webp";
+import creamCoffee from "@/assets/cream-coffee.webp";
+import blackCoffee from "@/assets/black-coffee.webp";
 import { getProducts, placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 
 type Language = "en" | "sq" | "mk";
 const LANGUAGE_STORAGE_KEY = "galla_lang";
+
+const EUR_TO_MKD_RATE = Number(import.meta.env.VITE_EUR_TO_MKD_RATE || 61.5);
 
 const capsuleProducts = [
   {
@@ -21,13 +24,13 @@ const capsuleProducts = [
     subtitle: "Standard Pack",
     image: capsuleClassic10,
     description:
-      "The quintessential Galla experience. A harmonious blend with a velvety crema and a smooth, lingering finish.",
-    price: 6.4,
+      "A balanced espresso blend with smooth crema and a lingering finish.",
+    price: 200 / EUR_TO_MKD_RATE,
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium",
     intensity: "7/10",
     format: "Box of 10 capsules",
-    compatibility: "Nespresso Original compatible",
+    compatibility: "Compatible with Nespresso Original machines",
     imageClassName: "",
   },
   {
@@ -36,13 +39,13 @@ const capsuleProducts = [
     subtitle: "Value Pack",
     image: capsuleClassic50,
     description:
-      "The same signature Classic profile in a larger box for high-volume use and longer stock at home or office.",
-    price: 28.9,
+      "The Classic blend in a larger pack for regular use at home or in the office.",
+    price: 1000 / EUR_TO_MKD_RATE,
     netWeight: "50 capsules x 5.5 g (275 g)",
     roast: "Medium",
     intensity: "7/10",
     format: "Box of 50 capsules",
-    compatibility: "Nespresso Original compatible",
+    compatibility: "Compatible with Nespresso Original machines",
     imageClassName: "mix-blend-multiply translate-y-5",
   },
   {
@@ -50,13 +53,13 @@ const capsuleProducts = [
     name: "Capsules Aroma",
     image: capsuleAroma,
     description:
-      "An olfactory journey. This medium-dark roast reveals deep floral notes and a sophisticated, cocoa-toned aftertaste.",
-    price: 6.9,
+      "A medium-dark roast with floral notes and a cocoa finish.",
+    price: 200 / EUR_TO_MKD_RATE,
     netWeight: "10 capsules x 5 g (50 g)",
     roast: "Medium-Dark",
     intensity: "8/10",
     format: "Box of 10 capsules",
-    compatibility: "Nespresso Original compatible",
+    compatibility: "Compatible with Nespresso Original machines",
     imageClassName: "",
   },
 ];
@@ -67,33 +70,32 @@ const espressoProducts = [
     name: "Galla Classic",
     image: classicCoffee,
     description:
-      "This unique mixture combines high quality Arabica beans with selected Robusta beans from South America for a smooth crema and strong espresso character.",
+      "A blend of high-quality Arabica and selected Robusta beans from South America, with smooth crema and an intense flavor.",
   },
   {
     id: "espresso-aroma",
     name: "Galla Aroma",
     image: aromaCoffee,
     description:
-      "Well defined mixture of high quality Arabica and Asiatic Robusta, carefully controlled and medium roasted for rich aroma and balance.",
+      "A medium-roast blend of high-quality Arabica and Asian Robusta, with a rich aroma and balanced flavor.",
   },
   {
     id: "espresso-cream",
     name: "Galla Cream",
     image: creamCoffee,
     description:
-      "Balanced middle-roast blend with creamy texture and clean finish, crafted for consistent daily espresso enjoyment.",
+      "A balanced, medium-roast blend with a creamy texture and a clean finish.",
   },
   {
     id: "espresso-black",
     name: "Galla Black",
     image: blackCoffee,
     description:
-      "Premium espresso blend with deep character, full body, and balanced acidity for customers who prefer stronger flavor notes.",
+      "A full-bodied espresso blend with a rich aroma and balanced acidity.",
   },
 ];
 
 const CART_STORAGE_KEY = "galla_capsules_cart";
-const EUR_TO_MKD_RATE = Number(import.meta.env.VITE_EUR_TO_MKD_RATE || 61.5);
 const SHIPPING_MKD = 120;
 const FREE_SHIPPING_MKD = 2150;
 const toMkd = (eur: number) => Math.round(eur * EUR_TO_MKD_RATE);
@@ -102,12 +104,20 @@ const INITIAL_CAPSULE_QTY = Object.fromEntries(capsuleProducts.map((product) => 
 const capsuleTranslations = {
   en: {
     home: "Home",
+    perCapsule: "per capsule",
+    shopTitle: "Galla Capsules",
+    shopIntro: "Choose your blend and pack size. Compatible with Nespresso Original machines.",
+    chooseCapsules: "Choose your capsules",
+    checkout: "Checkout",
+    productDetails: "Product details",
+    addPack: "Add a pack",
+
     capsules: "Capsules",
-    newProductLine: "New Product Line",
+    newProductLine: "The Art of Espresso",
     title: "The Art of Espresso, Encapsulated",
     intro: "Discover the exquisite Galla collection.",
-    capsClassic: "Capsules Classic",
-    capsAroma: "Capsules Aroma",
+    capsClassic: "Classic Capsules",
+    capsAroma: "Aroma Capsules",
     standardPack: "Standard Pack",
     valuePack: "Value Pack",
     weight: "Weight",
@@ -126,12 +136,13 @@ const capsuleTranslations = {
     yourName: "Your name",
     yourEmail: "Your email",
     phone: "Phone number",
+    phoneOptional: "Phone number (optional)",
     deliveryAddress: "Street and delivery address",
     city: "City",
     postalCodeOptional: "Postal code (optional)",
     paymentMethod: "Payment method",
     cashOnDelivery: "Cash on delivery",
-    cashOnDeliveryHelp: "Pay the courier in MKD cash when your order arrives.",
+    cashOnDeliveryHelp: "Pay the courier in cash in MKD when your order arrives.",
     orderNoteOptional: "Order note (optional)",
     noProducts: "No products selected yet.",
     subtotal: "Subtotal",
@@ -145,13 +156,13 @@ const capsuleTranslations = {
     orderNumber: "Order number",
     confirmationEmail: "A confirmation email was sent to",
     acceptPolicies: "I have read and agree to:",
-    orderFailed: "Failed to send order.",
+    orderFailed: "Could not submit your order.",
     freeShippingNote: "Delivery across North Macedonia in 3–5 business days. Delivery is 120 MKD and free above 2,150 MKD.",
-    ordersSubmittedApi: "Orders are submitted directly to the backend API.",
+    ordersSubmittedApi: "Please check your contact and delivery details before placing your order.",
     espressoProducts: "Espresso Products",
-    alsoAvailable: "Also Available To Order",
+    alsoAvailable: "Also Available to Order",
     espressoIntro:
-      "Classic, Aroma, Cream, and Black espresso are also available for purchase. Prices are not displayed yet. Contact us for order details.",
+      "Classic, Aroma, Cream, and Black espresso blends are also available to order. Contact us for prices and order details.",
     availableForOrder: "Available For Order",
     requestOffer: "Request Offer",
     espressoInquiryForm: "Espresso Inquiry Form",
@@ -162,36 +173,45 @@ const capsuleTranslations = {
   },
   sq: {
     home: "Ballina",
+    perCapsule: "për kapsulë",
+    shopTitle: "Kapsulat Galla",
+    shopIntro: "Zgjidhni përzierjen dhe madhësinë e paketës. Të përshtatshme për makinat Nespresso Original.",
+    chooseCapsules: "Zgjidhni kapsulat",
+    checkout: "Përfundoni porosinë",
+    productDetails: "Detajet e produktit",
+    addPack: "Shtoni një paketë",
+
     capsules: "Kapsula",
-    newProductLine: "Linja e Re e Produkteve",
-    title: "Arti i Espressos, i Kapsuluar",
-    intro: "Zbuloni koleksionin e shkëlqyer Galla.",
+    newProductLine: "Arti i espressos",
+    title: "Espresso në kapsula",
+    intro: "Zbuloni koleksionin e kapsulave Galla.",
     capsClassic: "Kapsula Classic",
     capsAroma: "Kapsula Aroma",
-    standardPack: "Paketa Standarde",
-    valuePack: "Paketa Value",
+    standardPack: "Paketë standarde",
+    valuePack: "Paketë ekonomike",
     weight: "Pesha",
     roast: "Pjekja",
     intensity: "Intensiteti",
     format: "Formati",
     compatibility: "Përputhshmëria",
     inStock: "Në stok",
-    outOfStock: "Nuk ka stok",
+    outOfStock: "Nuk është në stok",
     leftInStock: "të mbetura",
     dispatch24: "Dorëzim brenda 3–5 ditëve pune",
     vatIncluded: "TVSH e përfshirë",
-    orderSummary: "Përmbledhja e Porosisë",
+    orderSummary: "Përmbledhja e porosisë",
     packsSelected: "Paketa të zgjedhura",
-    emptyCart: "Zbraz Shportën",
+    emptyCart: "Zbrazni shportën",
     yourName: "Emri juaj",
     yourEmail: "Email-i juaj",
     phone: "Numri i telefonit",
+    phoneOptional: "Numri i telefonit (opsional)",
     deliveryAddress: "Rruga dhe adresa e dorëzimit",
     city: "Qyteti",
     postalCodeOptional: "Kodi postar (opsional)",
     paymentMethod: "Mënyra e pagesës",
-    cashOnDelivery: "Pagesë me para në dorëzim",
-    cashOnDeliveryHelp: "Paguani korrierin me para në MKD kur të mbërrijë porosia.",
+    cashOnDelivery: "Pagesë me para në dorë gjatë dorëzimit",
+    cashOnDeliveryHelp: "Paguani korrierin me para në dorë në MKD kur të mbërrijë porosia.",
     orderNoteOptional: "Shënim porosie (opsional)",
     noProducts: "Ende nuk ka produkte të zgjedhura.",
     subtotal: "Nëntotali",
@@ -199,37 +219,45 @@ const capsuleTranslations = {
     total: "Totali",
     free: "Falas",
     submitting: "Duke dërguar...",
-    placeOrder: "Bëj Porosinë",
-    orderSuccess: "Porosia u bë me sukses. Pagesa bëhet me para në dorëzim.",
-    confirmationTitle: "Porosia u Konfirmua",
+    placeOrder: "Bëni porosinë",
+    orderSuccess: "Porosia u krye me sukses. Pagesa bëhet me para në dorë gjatë dorëzimit.",
+    confirmationTitle: "Porosia u konfirmua",
     orderNumber: "Numri i porosisë",
     confirmationEmail: "Një email konfirmimi u dërgua te",
     acceptPolicies: "I kam lexuar dhe i pranoj:",
     orderFailed: "Dërgimi i porosisë dështoi.",
     freeShippingNote: "Dorëzim në gjithë Maqedoninë e Veriut brenda 3–5 ditëve pune. Transporti kushton 120 MKD dhe është falas mbi 2.150 MKD.",
-    ordersSubmittedApi: "Porositë dërgohen direkt në backend API.",
-    espressoProducts: "Produktet Espresso",
+    ordersSubmittedApi: "Ju lutemi, kontrolloni të dhënat e kontaktit dhe adresën e dorëzimit përpara se të bëni porosinë.",
+    espressoProducts: "Përzierje për espresso",
     alsoAvailable: "Gjithashtu në dispozicion për porosi",
     espressoIntro:
-      "Classic, Aroma, Cream dhe Black espresso janë gjithashtu në dispozicion për porosi. Çmimet nuk shfaqen ende. Na kontaktoni për detajet e porosisë.",
+      "Përzierjet Classic, Aroma, Cream dhe Black janë gjithashtu të disponueshme për porosi. Na kontaktoni për çmimet dhe detajet e porosisë.",
     availableForOrder: "Në dispozicion për porosi",
-    requestOffer: "Kërko Ofertë",
-    espressoInquiryForm: "Formulari i Kërkesës Espresso",
+    requestOffer: "Kërkoni ofertë",
+    espressoInquiryForm: "Kërkesë për përzierje espresso",
     messageOptional: "Mesazh (opsional)",
-    sendInquiry: "Dërgo Kërkesën",
+    sendInquiry: "Dërgoni kërkesën",
     inquirySuccess: "Kërkesa u dërgua me sukses.",
     inquiryFailed: "Dërgimi i kërkesës dështoi.",
   },
   mk: {
     home: "Почетна",
+    perCapsule: "по капсула",
+    shopTitle: "Капсули Galla",
+    shopIntro: "Изберете мешавина и големина на пакување. Компатибилни со машините Nespresso Original.",
+    chooseCapsules: "Изберете капсули",
+    checkout: "Завршете ја нарачката",
+    productDetails: "Детали за производот",
+    addPack: "Додајте пакување",
+
     capsules: "Капсули",
-    newProductLine: "Нова Линија",
-    title: "Уметноста на Еспресото, Капсулирана",
-    intro: "Откриј ја извонредната Galla колекција.",
+    newProductLine: "Уметноста на еспресото",
+    title: "Еспресо во капсули",
+    intro: "Откријте ја колекцијата капсули Galla.",
     capsClassic: "Капсули Classic",
     capsAroma: "Капсули Aroma",
-    standardPack: "Стандард Пакет",
-    valuePack: "Value Пакет",
+    standardPack: "Стандардно пакување",
+    valuePack: "Економично пакување",
     weight: "Тежина",
     roast: "Печење",
     intensity: "Интензитет",
@@ -239,19 +267,20 @@ const capsuleTranslations = {
     outOfStock: "Нема на залиха",
     leftInStock: "преостанати",
     dispatch24: "Испорака за 3–5 работни дена",
-    vatIncluded: "ДДВ вклучен",
-    orderSummary: "Резиме на Нарачка",
+    vatIncluded: "Вклучен ДДВ",
+    orderSummary: "Преглед на нарачката",
     packsSelected: "Избрани пакувања",
-    emptyCart: "Испразни Кошничка",
-    yourName: "Ваше име",
-    yourEmail: "Ваш email",
+    emptyCart: "Испразнете ја кошничката",
+    yourName: "Вашето име",
+    yourEmail: "Вашата е-пошта",
     phone: "Телефонски број",
+    phoneOptional: "Телефонски број (опционално)",
     deliveryAddress: "Улица и адреса за достава",
     city: "Град",
     postalCodeOptional: "Поштенски број (опционално)",
     paymentMethod: "Начин на плаќање",
     cashOnDelivery: "Плаќање во готово при достава",
-    cashOnDeliveryHelp: "Платете му во денари на курирот кога ќе пристигне нарачката.",
+    cashOnDeliveryHelp: "Платете му на курирот во готово, во денари, кога ќе пристигне нарачката.",
     orderNoteOptional: "Белешка за нарачка (опционално)",
     noProducts: "Сè уште нема избрани производи.",
     subtotal: "Меѓузбир",
@@ -259,24 +288,24 @@ const capsuleTranslations = {
     total: "Вкупно",
     free: "Бесплатно",
     submitting: "Се испраќа...",
-    placeOrder: "Нарачај",
+    placeOrder: "Нарачајте",
     orderSuccess: "Нарачката е успешно направена. Плаќањето е во готово при достава.",
-    confirmationTitle: "Нарачката е Потврдена",
+    confirmationTitle: "Нарачката е потврдена",
     orderNumber: "Број на нарачка",
     confirmationEmail: "Е-пошта за потврда е испратена до",
     acceptPolicies: "Ги прочитав и ги прифаќам:",
     orderFailed: "Неуспешно испраќање на нарачка.",
     freeShippingNote: "Испорака низ Северна Македонија за 3–5 работни дена. Доставата е 120 денари и е бесплатна над 2.150 денари.",
-    ordersSubmittedApi: "Нарачките се испраќаат директно до backend API.",
-    espressoProducts: "Еспресо Производи",
-    alsoAvailable: "Исто така достапно за нарачка",
+    ordersSubmittedApi: "Проверете ги контакт-информациите и адресата за достава пред да ја поднесете нарачката.",
+    espressoProducts: "Мешавини за еспресо",
+    alsoAvailable: "Достапни и за нарачка",
     espressoIntro:
-      "Classic, Aroma, Cream и Black еспресо се исто така достапни за нарачка. Цените не се прикажани сè уште. Контактирајте нè за детали.",
+      "Мешавините Classic, Aroma, Cream и Black се исто така достапни за нарачка. Контактирајте нè за цени и детали за нарачката.",
     availableForOrder: "Достапно за нарачка",
-    requestOffer: "Побарај Понуда",
-    espressoInquiryForm: "Формулар за Espresso",
+    requestOffer: "Побарајте понуда",
+    espressoInquiryForm: "Барање за мешавини за еспресо",
     messageOptional: "Порака (опционално)",
-    sendInquiry: "Испрати Барање",
+    sendInquiry: "Испратете барање",
     inquirySuccess: "Барањето е успешно испратено.",
     inquiryFailed: "Неуспешно испраќање на барањето.",
   },
@@ -289,7 +318,6 @@ const Capsules = () => {
     return saved === "sq" || saved === "mk" ? saved : "en";
   });
   const t = capsuleTranslations[lang];
-  const [capsuleClassic50Transparent, setCapsuleClassic50Transparent] = useState(capsuleClassic50);
 
   const [capsuleQty, setCapsuleQty] = useState<Record<string, number>>(() => {
     if (typeof window === "undefined") {
@@ -379,96 +407,6 @@ const Capsules = () => {
   useEffect(() => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
   }, [lang]);
-
-  useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = capsuleClassic50;
-
-    img.onload = () => {
-      const width = img.width;
-      const height = img.height;
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      ctx.drawImage(img, 0, 0, width, height);
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const { data } = imageData;
-
-      const corners = [
-        0,
-        (width - 1) * 4,
-        ((height - 1) * width) * 4,
-        ((height - 1) * width + (width - 1)) * 4,
-      ];
-
-      const bg = corners.reduce(
-        (acc, idx) => {
-          acc.r += data[idx];
-          acc.g += data[idx + 1];
-          acc.b += data[idx + 2];
-          return acc;
-        },
-        { r: 0, g: 0, b: 0 },
-      );
-
-      const bgR = bg.r / corners.length;
-      const bgG = bg.g / corners.length;
-      const bgB = bg.b / corners.length;
-      const threshold = 70;
-
-      const visited = new Uint8Array(width * height);
-      const queue = new Uint32Array(width * height);
-      let head = 0;
-      let tail = 0;
-
-      const enqueue = (x: number, y: number) => {
-        const index = y * width + x;
-        if (!visited[index]) {
-          visited[index] = 1;
-          queue[tail++] = index;
-        }
-      };
-
-      const matchesBackground = (index: number) => {
-        const i = index * 4;
-        const dr = data[i] - bgR;
-        const dg = data[i + 1] - bgG;
-        const db = data[i + 2] - bgB;
-        return Math.sqrt(dr * dr + dg * dg + db * db) < threshold;
-      };
-
-      for (let x = 0; x < width; x += 1) {
-        enqueue(x, 0);
-        enqueue(x, height - 1);
-      }
-      for (let y = 1; y < height - 1; y += 1) {
-        enqueue(0, y);
-        enqueue(width - 1, y);
-      }
-
-      while (head < tail) {
-        const index = queue[head++];
-        if (!matchesBackground(index)) continue;
-
-        const i = index * 4;
-        data[i + 3] = 0;
-
-        const x = index % width;
-        const y = Math.floor(index / width);
-        if (x > 0) enqueue(x - 1, y);
-        if (x < width - 1) enqueue(x + 1, y);
-        if (y > 0) enqueue(x, y - 1);
-        if (y < height - 1) enqueue(x, y + 1);
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-      setCapsuleClassic50Transparent(canvas.toDataURL("image/png"));
-    };
-  }, []);
 
   const increaseCapsule = (id: string) => {
     const availability = productAvailability[id];
@@ -564,23 +502,30 @@ const Capsules = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Helvetica_Neue','Roboto',sans-serif] text-[#1f1f1f]">
+    <div className="min-h-screen pb-24 bg-[#faf9f7] font-['Inter',sans-serif] text-[#1f1f1f]">
       <CompactHeader cartCount={totalCapsulePacks} cartHref="#order-summary" lang={lang} onLangChange={setLang} />
-      <div className="pb-14 pt-20 md:pb-20 md:pt-24">
+      <div className="pb-14 pt-8 md:pb-20 md:pt-12">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-[0.1em] text-[#787878]">
             <Link to="/" className="transition-colors hover:text-[#9e0102]">
               {t.home}
             </Link>{" "}
             &gt; <span className="text-[#9e0102]">{t.capsules}</span>
           </p>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9e0102]">{t.newProductLine}</p>
-          <h1 className="mt-3 text-4xl font-medium tracking-tight md:text-5xl">{t.title}</h1>
-          <p className="mt-4 text-base leading-8 text-[#3a3a3a] md:text-lg">
-            {t.intro}
+          <h1 className="mt-6 text-4xl font-medium tracking-tight md:text-5xl">{t.shopTitle}</h1>
+          <p className="mt-3 font-serif text-2xl leading-8 text-[#9e0102] md:text-3xl">{t.newProductLine}</p>
+          <p className="mt-5 text-base leading-8 text-[#3a3a3a] md:text-lg">
+            {t.shopIntro}
           </p>
         </div>
+
+        <nav aria-label={t.capsules} className="mt-7 flex flex-wrap gap-3 border-b border-[#e3ddd6] pb-6 text-sm font-medium">
+          <a href="#capsule-collection" className="rounded-full bg-[#9e0102] px-5 py-2.5 text-white">{t.chooseCapsules}</a>
+          <a href="#order-summary" className="rounded-full border border-[#d8cfc5] px-5 py-2.5 hover:bg-white">{t.checkout}{totalCapsulePacks > 0 ? ` (${totalCapsulePacks})` : ""}</a>
+          <a href="#espresso-collection" className="rounded-full border border-[#d8cfc5] px-5 py-2.5 hover:bg-white">{t.espressoProducts}</a>
+        </nav>
+        <p className="mt-4 text-xs leading-6 text-[#71665c]">{t.freeShippingNote}</p>
 
         {confirmedOrder && (
           <section
@@ -601,29 +546,18 @@ const Capsules = () => {
           </section>
         )}
 
-        <div className={`mt-12 grid grid-cols-1 gap-10 ${hasCapsuleSelection ? "lg:grid-cols-[minmax(0,7fr)_minmax(320px,3fr)]" : ""}`}>
-          <div
-            className="flex flex-col gap-8 md:flex-row md:flex-wrap md:items-stretch"
-          >
+        <div className="mt-8">
+          <div id="capsule-collection" className="grid scroll-mt-28 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {capsuleProducts.map((product) => (
               <article
                 key={product.id}
-                className={`flex w-full flex-col rounded-[12px] border border-[#ece6df] bg-white p-5 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)] ${
-                  hasCapsuleSelection ? "md:basis-[calc(50%-1rem)]" : "md:basis-[calc(50%-1rem)] xl:basis-[calc(33.333%-1.34rem)]"
-                }`}
+                className="flex min-w-0 flex-col rounded-xl border border-[#e5dfd8] bg-white p-5 md:p-6"
               >
-                <div className="relative flex h-[250px] items-center justify-center p-3">
-                  {product.id === "capsules-classic-50x" && (
-                    <span className="absolute right-3 top-3 z-10 rounded-md bg-[#9e0102] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white shadow-md animate-pulse">
-                      50X
-                    </span>
-                  )}
-                  <img
-                    src={product.id === "capsules-classic-50x" ? capsuleClassic50Transparent : product.image}
-                    alt={product.name}
-                    className={`mx-auto h-[220px] w-auto object-contain ${product.imageClassName ?? ""}`}
-                  />
-                </div>
+                <ProductImage
+                  image={product.image}
+                  name={product.name}
+                  overlay={<span className="rounded-full bg-[#f3efea] px-3 py-1.5 text-xs font-semibold text-[#574a3e]">{product.id === "capsules-classic-50x" ? "50" : "10"} {t.capsules.toLowerCase()}</span>}
+                />
 
                 <div className="mt-4 flex flex-1 flex-col">
                   <div className="flex items-start justify-between gap-3">
@@ -631,27 +565,31 @@ const Capsules = () => {
                       <h2 className="text-2xl font-medium leading-tight tracking-tight">
                         {product.id.startsWith("capsules-classic") ? t.capsClassic : t.capsAroma}
                       </h2>
-                      {product.subtitle && (
+                      {(
                         <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#6d6d6d]">
                           {product.id === "capsules-classic-50x" ? t.valuePack : t.standardPack}
                         </p>
                       )}
                     </div>
                     <p className="text-right text-sm font-bold leading-5 text-[#9e0102]">
-                      EUR {product.price.toFixed(2)}<br />{toMkd(product.price)} MKD
+                      {toMkd(product.price)} MKD<br /><span className="text-xs font-normal text-[#77695d]">EUR {product.price.toFixed(2)}</span>
                     </p>
                   </div>
-                  <p className="mt-2 min-h-[96px] text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
+                  <p className="mt-1 text-[11px] text-[#77695d]">{t.vatIncluded}</p>
+                  <p className="mt-2 min-h-[72px] text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
 
-                  <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-[#3b3b3b] md:text-sm">
-                    <p><span className="font-semibold">{t.weight}:</span> {product.netWeight}</p>
-                    <p><span className="font-semibold">{t.roast}:</span> {product.roast}</p>
-                    <p><span className="font-semibold">{t.intensity}:</span> {product.intensity}</p>
-                    <p><span className="font-semibold">{t.format}:</span> {product.format}</p>
-                    <p className="col-span-2"><span className="font-semibold">{t.compatibility}:</span> {product.compatibility}</p>
+                  <div className="mt-4 flex items-center gap-3 border-t border-[#eee8e1] pt-4 text-xs">
+                    <span className="font-semibold">{t.intensity} {product.intensity}</span>
+                    <div className="flex gap-1" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <span key={index} className={`h-1.5 w-2 rounded-sm ${index < Number(product.intensity.split("/")[0]) ? "bg-[#9e0102]" : "bg-[#e8e1d8]"}`} />)}</div>
                   </div>
+                  <details className="mt-4 text-xs leading-6 text-[#62564a]">
+                    <summary className="cursor-pointer font-medium text-[#29231e]">{t.productDetails}</summary>
+                    <p className="mt-2">{t.weight}: {product.netWeight}</p>
+                    <p>{t.roast}: {product.roast}</p>
+                    <p>{t.compatibility}: {product.compatibility}</p>
+                  </details>
 
-                  <div className="mt-4 flex items-center justify-between text-xs">
+                  <div className="mb-5 mt-4 flex items-center justify-between gap-2 text-xs">
                     <p className={`font-semibold ${productAvailability[product.id]?.inStock ? "text-green-700" : "text-red-700"}`}>
                       {productAvailability[product.id]?.inStock ? t.inStock : t.outOfStock}
                       {productAvailability[product.id]?.stockQuantity !== null && productAvailability[product.id]?.stockQuantity !== undefined
@@ -665,6 +603,7 @@ const Capsules = () => {
                     <div className="inline-flex items-center rounded-md border border-[#cab8a6]">
                       <button
                         type="button"
+                        aria-label={`${t.packsSelected}: − ${product.name}`}
                         onClick={() => decreaseCapsule(product.id)}
                         className="h-9 w-9 text-lg leading-none transition-colors hover:bg-[#f4ece4]"
                       >
@@ -673,6 +612,7 @@ const Capsules = () => {
                       <span className="w-10 text-center text-sm font-semibold">{capsuleQty[product.id]}</span>
                       <button
                         type="button"
+                        aria-label={`${t.addPack}: ${product.name}`}
                         onClick={() => increaseCapsule(product.id)}
                         disabled={
                           !productAvailability[product.id]?.inStock ||
@@ -684,15 +624,17 @@ const Capsules = () => {
                         +
                       </button>
                     </div>
-                    <p className="text-xs text-[#5d554e]">{t.vatIncluded}</p>
+                    <button type="button" onClick={() => increaseCapsule(product.id)} disabled={!productAvailability[product.id]?.inStock || (productAvailability[product.id]?.stockQuantity != null && capsuleQty[product.id] >= productAvailability[product.id].stockQuantity)} className="rounded-md bg-[#9e0102] px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#800102] disabled:cursor-not-allowed disabled:opacity-40">{t.addPack}</button>
                   </div>
                 </div>
               </article>
             ))}
           </div>
 
-          {hasCapsuleSelection && (
-          <aside id="order-summary" className="h-fit rounded-[12px] border border-[#e8e1d8] bg-white p-6 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
+          <aside id="order-summary" className="mt-10 scroll-mt-28 rounded-xl border border-[#e8e1d8] bg-white p-6 md:p-8">
+            <h2 className="mb-5 text-2xl font-semibold tracking-tight">{t.checkout}</h2>
+            {!hasCapsuleSelection && <p className="text-sm text-[#62564a]">{t.noProducts} <a href="#capsule-collection" className="text-[#9e0102] underline">{t.chooseCapsules}</a></p>}
+            {hasCapsuleSelection && <>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9e0102]">{t.orderSummary}</p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-sm text-[#4a4a4a]">
@@ -707,11 +649,12 @@ const Capsules = () => {
               </button>
             </div>
 
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
               <input
                 type="text"
                 value={orderForm.customerName}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerName: event.target.value }))}
+                aria-label={t.yourName}
                 placeholder={t.yourName}
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
@@ -719,6 +662,7 @@ const Capsules = () => {
                 type="email"
                 value={orderForm.customerEmail}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerEmail: event.target.value }))}
+                aria-label={t.yourEmail}
                 placeholder={t.yourEmail}
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
@@ -726,6 +670,7 @@ const Capsules = () => {
                 type="tel"
                 value={orderForm.customerPhone}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                aria-label={t.phone}
                 placeholder={t.phone}
                 required
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
@@ -734,6 +679,7 @@ const Capsules = () => {
                 type="text"
                 value={orderForm.deliveryAddress}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, deliveryAddress: event.target.value }))}
+                aria-label={t.deliveryAddress}
                 placeholder={t.deliveryAddress}
                 autoComplete="street-address"
                 required
@@ -744,7 +690,8 @@ const Capsules = () => {
                   type="text"
                   value={orderForm.city}
                   onChange={(event) => setOrderForm((prev) => ({ ...prev, city: event.target.value }))}
-                  placeholder={t.city}
+                  aria-label={t.city}
+                placeholder={t.city}
                   autoComplete="address-level2"
                   required
                   className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
@@ -753,7 +700,8 @@ const Capsules = () => {
                   type="text"
                   value={orderForm.postalCode}
                   onChange={(event) => setOrderForm((prev) => ({ ...prev, postalCode: event.target.value }))}
-                  placeholder={t.postalCodeOptional}
+                  aria-label={t.postalCodeOptional}
+                placeholder={t.postalCodeOptional}
                   autoComplete="postal-code"
                   className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
                 />
@@ -761,6 +709,7 @@ const Capsules = () => {
               <textarea
                 value={orderForm.note}
                 onChange={(event) => setOrderForm((prev) => ({ ...prev, note: event.target.value }))}
+                aria-label={t.orderNoteOptional}
                 placeholder={t.orderNoteOptional}
                 rows={3}
                 className="w-full resize-y rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
@@ -836,7 +785,7 @@ const Capsules = () => {
                 !acceptedPolicies ||
                 !hasCapsuleSelection
               }
-              className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-[#8B1A1A] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors duration-200 hover:bg-[#741313]"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-[6px] bg-[#8B1A1A] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors duration-200 hover:bg-[#741313] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {orderSubmitState === "loading" ? t.submitting : t.placeOrder}
             </button>
@@ -848,26 +797,24 @@ const Capsules = () => {
 
             <p className="mt-3 text-xs text-[#6d6259]">{t.freeShippingNote}</p>
             <p className="mt-2 text-xs text-[#6d6259]">{t.ordersSubmittedApi}</p>
+            </>}
           </aside>
-          )}
         </div>
 
-        <div className="mt-16 border-t border-[#dbcfc4] pt-12">
+        <div id="espresso-collection" className="mt-16 scroll-mt-28 border-t border-[#dbcfc4] pt-12">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9e0102]">{t.espressoProducts}</p>
           <h2 className="mt-2 text-3xl font-medium tracking-tight md:text-4xl">{t.alsoAvailable}</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[#4a4a4a] md:text-base">
             {t.espressoIntro}
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
             {espressoProducts.map((product) => (
-              <article key={product.id} className="rounded-2xl border border-[#dbcfc4] bg-white p-6 shadow-md">
-                <div className="rounded-xl bg-[#f7f3ee] p-4">
-                  <img src={product.image} alt={product.name} className="mx-auto h-40 w-auto object-contain md:h-44" />
-                </div>
+              <article key={product.id} className="flex flex-col rounded-xl border border-[#e5dfd8] bg-white p-6">
+                <ProductImage image={product.image} name={product.name} />
                 <h3 className="mt-4 text-2xl font-medium tracking-tight text-[#1f1f1f]">{product.name}</h3>
                 <p className="mt-2 text-sm leading-7 text-[#4f4f4f]">{product.description}</p>
-                <div className="mt-4 flex items-center justify-between">
+                <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#9e0102]">{t.availableForOrder}</p>
                   <button
                     type="button"
@@ -884,7 +831,7 @@ const Capsules = () => {
           <form
             id="espresso-inquiry-form"
             onSubmit={handleEspressoInquirySubmit}
-            className="mt-8 rounded-2xl border border-[#dbcfc4] bg-white p-6 shadow-md"
+            className="mt-8 rounded-xl border border-[#e5dfd8] bg-white p-6"
           >
             <p className="text-sm font-semibold uppercase tracking-[0.1em] text-[#9e0102]">{t.espressoInquiryForm}</p>
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -913,6 +860,7 @@ const Capsules = () => {
                 required
                 value={espressoForm.customerName}
                 onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerName: event.target.value }))}
+                aria-label={t.yourName}
                 placeholder={t.yourName}
                 className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
               />
@@ -921,6 +869,7 @@ const Capsules = () => {
                 required
                 value={espressoForm.customerEmail}
                 onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerEmail: event.target.value }))}
+                aria-label={t.yourEmail}
                 placeholder={t.yourEmail}
                 className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
               />
@@ -928,12 +877,14 @@ const Capsules = () => {
                 type="text"
                 value={espressoForm.customerPhone}
                 onChange={(event) => setEspressoForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                aria-label={t.phoneOptional}
                 placeholder={t.phoneOptional}
                 className="w-full rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102]"
               />
               <textarea
                 value={espressoForm.message}
                 onChange={(event) => setEspressoForm((prev) => ({ ...prev, message: event.target.value }))}
+                aria-label={t.messageOptional}
                 placeholder={t.messageOptional}
                 rows={3}
                 className="w-full resize-y rounded-md border border-[#d6c8bb] px-3 py-2 text-sm outline-none focus:border-[#9e0102] md:col-span-2"
@@ -956,6 +907,12 @@ const Capsules = () => {
         </div>
       </div>
       </div>
+      {hasCapsuleSelection && <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#dfd6cb] bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div><p className="text-xs text-[#71665c]">{t.packsSelected}: {totalCapsulePacks}</p><p className="text-sm font-semibold">{dualPrice(finalTotalMkd)}</p></div>
+          <a href="#order-summary" className="rounded-md bg-[#9e0102] px-5 py-3 text-sm font-semibold text-white">{t.checkout}</a>
+        </div>
+      </div>}
       <StoreFooter />
     </div>
   );
