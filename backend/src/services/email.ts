@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { buildOrderConfirmation } from "./orderEmail.js";
 import type { CapsuleOrder, ContactMessage, EspressoInquiry } from "../types.js";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
@@ -7,7 +8,7 @@ const MAIL_TO = process.env.MAIL_TO || "minetamexhiti01@gmail.com";
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-async function sendEmail(to: string, subject: string, text: string) {
+async function sendEmail(to: string, subject: string, text: string, richEmail?: ReturnType<typeof buildOrderConfirmation>) {
   if (!resend) {
     console.warn("Email skipped: RESEND_API_KEY is not configured");
     return { sent: false, reason: "missing_api_key" as const };
@@ -18,6 +19,8 @@ async function sendEmail(to: string, subject: string, text: string) {
     to: [to],
     subject,
     text,
+    ...(richEmail || {}),
+    replyTo: MAIL_TO,
   });
 
   if (result.error) throw new Error(`Email could not be sent: ${result.error.message}`);
@@ -95,7 +98,7 @@ export function sendCapsuleOrderConfirmation(order: CapsuleOrder) {
     "Galla Caffe",
   ].join("\n");
 
-  return sendEmail(order.customerEmail, subject, text);
+  return sendEmail(order.customerEmail, subject, text, buildOrderConfirmation(order));
 }
 
 export async function sendEspressoInquiryNotification(inquiry: EspressoInquiry) {
