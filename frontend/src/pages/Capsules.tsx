@@ -135,6 +135,7 @@ const capsuleTranslations = {
     inStock: "In stock",
     outOfStock: "Out of stock",
     leftInStock: "left",
+    stockLimit: (count: number) => `Only ${count} ${count === 1 ? "pack is" : "packs are"} available. More packs are currently out of stock.`,
     dispatch24: "Delivery in 3–5 business days",
     vatIncluded: "VAT included",
     orderSummary: "Order Summary",
@@ -206,6 +207,7 @@ const capsuleTranslations = {
     inStock: "Në stok",
     outOfStock: "Nuk është në stok",
     leftInStock: "të mbetura",
+    stockLimit: (count: number) => `Në stok ${count === 1 ? "është vetëm 1 paketë" : `janë vetëm ${count} paketa`}. Më shumë paketa nuk janë aktualisht në stok.`,
     dispatch24: "Dorëzim brenda 3–5 ditëve pune",
     vatIncluded: "TVSH e përfshirë",
     orderSummary: "Përmbledhja e porosisë",
@@ -630,13 +632,15 @@ const Capsules = () => {
                   <div className="mb-5 mt-4 flex items-center justify-between gap-2 text-xs">
                     <p className={`font-semibold ${productAvailability[product.id]?.inStock ? "text-green-700" : "text-red-700"}`}>
                       {productAvailability[product.id]?.inStock ? t.inStock : t.outOfStock}
-                      {productAvailability[product.id]?.stockQuantity !== null && productAvailability[product.id]?.stockQuantity !== undefined
-                        ? ` · ${productAvailability[product.id].stockQuantity} ${t.leftInStock}`
-                        : ""}
                     </p>
                     <p className="text-[#5a5a5a]">{t.dispatch24}</p>
                   </div>
 
+                  {productAvailability[product.id]?.inStock && productAvailability[product.id]?.stockQuantity != null && capsuleQty[product.id] >= productAvailability[product.id].stockQuantity && (
+                    <p role="status" className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900">
+                      {t.stockLimit(productAvailability[product.id].stockQuantity)}
+                    </p>
+                  )}
                   <div className="mt-auto flex items-center justify-between border-t border-[#e6ddd4] pt-4">
                     <div className="inline-flex items-center rounded-md border border-[#cab8a6]">
                       <button

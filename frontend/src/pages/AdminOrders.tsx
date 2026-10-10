@@ -43,6 +43,8 @@ const adminTranslations = {
     loadError: "Could not load orders",
     updateError: "Could not update order",
     inventory: "Inventory",
+    inventoryReminder: "Received more capsules? Update your inventory!",
+    inventoryReminderHelp: "Enter the current number of complete packs for each capsule product and click Save. Update stock whenever new capsules arrive so customers can order the available quantity.",
     inventoryHelp: "Count complete packs, not individual capsules. Choose whether to track the number of packs available.",
     quantity: "Packs in stock",
     tracked: "Tracked",
@@ -75,6 +77,8 @@ const adminTranslations = {
     loadError: "Porositë nuk mund të ngarkoheshin",
     updateError: "Statusi nuk mund të ndryshohej",
     inventory: "Inventari",
+    inventoryReminder: "Keni marrë kapsula të reja? Përditësoni inventarin!",
+    inventoryReminderHelp: "Shkruani numrin aktual të paketave të plota për secilin produkt dhe klikoni Ruaj. Përditësoni stokun sa herë që mbërrijnë kapsula të reja, që klientët të porosisin sasinë në dispozicion.",
     inventoryHelp: "Numëroni paketat e plota, jo kapsulat veç e veç. Zgjidhni nëse dëshironi të përcaktoni numrin e paketave në stok.",
     quantity: "Paketa në stok",
     tracked: "I gjurmuar",
@@ -344,6 +348,10 @@ const AdminOrders = () => {
         <section className="mb-8 rounded-xl border border-[#dfd4ca] bg-white p-5 shadow-sm">
           <h2 className="font-serif text-2xl">{t.inventory}</h2>
           <p className="mt-1 text-sm text-[#62584f]">{t.inventoryHelp}</p>
+          <div className="mt-4 rounded-lg border-2 border-amber-400 bg-amber-50 p-5 text-amber-950">
+            <p className="text-lg font-bold md:text-xl">{t.inventoryReminder}</p>
+            <p className="mt-2 text-sm leading-relaxed">{t.inventoryReminderHelp}</p>
+          </div>
           <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {products.filter((product) => product.category === "capsules").map((product) => (
               <article key={product.code} className="rounded-lg border border-[#e3d9d0] p-4">
