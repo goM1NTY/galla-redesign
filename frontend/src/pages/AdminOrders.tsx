@@ -268,7 +268,8 @@ const AdminOrders = () => {
           key={option}
           type="button"
           onClick={() => changeLanguage(option)}
-          className={`rounded px-2.5 py-1 text-xs font-bold ${language === option ? "bg-[#9e0102] text-white" : "border border-[#d6c8bb] bg-white text-[#6b5b4f]"}`}
+          aria-pressed={language === option}
+          className={`rounded border px-2.5 py-1 text-xs font-bold ${language === option ? "border-[#d6c8bb] bg-white text-[#9e0102]" : "border-white/30 bg-[#9e0102] text-white"}`}
         >
           {option === "en" ? "EN" : "AL"}
         </button>
