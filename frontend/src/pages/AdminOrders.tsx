@@ -1,6 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  AdminProfile,
+  getAdminProfile,
+  saveAdminProfile,
   requestAdminCode,
   verifyAdminCode,
   logoutAdmin,
@@ -39,10 +42,10 @@ const adminTranslations = {
     loadError: "Could not load orders",
     updateError: "Could not update order",
     inventory: "Inventory",
-    inventoryHelp: "Leave quantity empty to keep stock untracked.",
-    quantity: "Quantity",
+    inventoryHelp: "Count complete packs, not individual capsules. Choose whether to track the number of packs available.",
+    quantity: "Packs in stock",
     tracked: "Tracked",
-    untracked: "Not tracked",
+    untracked: "No quantity limit",
     available: "Available",
     unavailable: "Unavailable",
     save: "Save",
@@ -71,10 +74,10 @@ const adminTranslations = {
     loadError: "Porositë nuk mund të ngarkoheshin",
     updateError: "Statusi nuk mund të ndryshohej",
     inventory: "Inventari",
-    inventoryHelp: "Lëreni sasinë bosh për të mos e gjurmuar stokun.",
-    quantity: "Sasia",
+    inventoryHelp: "Numëroni paketat e plota, jo kapsulat veç e veç. Zgjidhni nëse dëshironi të përcaktoni numrin e paketave në stok.",
+    quantity: "Paketa në stok",
     tracked: "I gjurmuar",
-    untracked: "Nuk gjurmohet",
+    untracked: "Pa kufi sasie",
     available: "Në dispozicion",
     unavailable: "Nuk është në dispozicion",
     save: "Ruaj",
@@ -126,6 +129,10 @@ const AdminOrders = () => {
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
+  const [profileName, setProfileName] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMessage, setProfileMessage] = useState("");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [stockDrafts, setStockDrafts] = useState<Record<string, string>>({});
@@ -140,7 +147,9 @@ const AdminOrders = () => {
     setLoading(true);
     setError("");
     try {
-      const [ordersResult, productsResult] = await Promise.all([getAdminOrders(token), getAdminProducts(token)]);
+      const [ordersResult, productsResult, profileResult] = await Promise.all([getAdminOrders(token), getAdminProducts(token), getAdminProfile(token)]);
+      setProfile(profileResult.data || null);
+      setProfileName(profileResult.data?.name || "");
       const loadedProducts = productsResult.data || [];
       setOrders(ordersResult.data || []);
       setProducts(loadedProducts);
@@ -200,6 +209,9 @@ const AdminOrders = () => {
     setLoginMessage("");
     window.sessionStorage.removeItem("galla_admin_session");
     setAdminKey("");
+    setProfile(null);
+    setProfileName("");
+    setProfileMessage("");
     setOrders([]);
     setProducts([]);
     setAuthenticated(false);
@@ -278,11 +290,30 @@ const AdminOrders = () => {
       <header className="bg-[#9e0102] text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5">
           <div><p className="text-xs uppercase tracking-[0.18em] text-[#ffd7d1]">{t.internal}</p><h1 className="font-serif text-2xl">{t.orders}</h1></div>
-          <div className="flex items-center gap-2">{languageButtons}<button onClick={() => loadOrders()} className="rounded-md border border-white/40 px-3 py-2 text-sm">{t.refresh}</button><button onClick={signOut} className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-[#9e0102]">{t.signOut}</button></div>
+          <div className="flex flex-wrap items-center justify-end gap-2"><a href="#my-profile" className="mr-2 flex items-center gap-2 rounded-md border border-white/30 px-3 py-2"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-[#9e0102]">{(profile?.name || profile?.email || "A").split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()}</span><span className="text-left"><span className="block text-sm font-semibold">{profile?.name || profile?.email}</span><span className="block text-xs text-white/80">{language === "sq" ? "Administratori" : "Administrator"}</span></span></a>{languageButtons}<button onClick={() => loadOrders()} className="rounded-md border border-white/40 px-3 py-2 text-sm">{t.refresh}</button><button onClick={signOut} className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-[#9e0102]">{t.signOut}</button></div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-8">
         {error && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        <details id="my-profile" className="mb-6 scroll-mt-24 rounded-xl border border-[#dfd4ca] bg-white p-5">
+          <summary className="cursor-pointer font-semibold">{language === "sq" ? "Profili im" : "My profile"}</summary>
+          <form className="mt-4 max-w-md" onSubmit={async (event) => {
+            event.preventDefault(); setSavingProfile(true); setProfileMessage("");
+            try {
+              const result = await saveAdminProfile(adminKey, profileName);
+              if (result.data) setProfile(result.data);
+              setProfileMessage(language === "sq" ? "Profili u ruajt." : "Profile saved.");
+            } catch (requestError) { setProfileMessage(requestError instanceof Error ? requestError.message : "Could not save profile."); }
+            finally { setSavingProfile(false); }
+          }}>
+            <label htmlFor="profile-name" className="block text-sm font-semibold">{language === "sq" ? "Emri" : "Name"}</label>
+            <input id="profile-name" value={profileName} onChange={(event) => setProfileName(event.target.value)} minLength={2} maxLength={80} required autoComplete="name" className="mt-2 w-full rounded-md border border-[#d6c8bb] px-3 py-2" />
+            <p className="mt-3 break-all text-sm text-[#62584f]">{profile?.email}</p>
+            <p className="mt-2 text-sm text-[#62584f]">{language === "sq" ? "Qasje e plotë në porositë dhe inventarin e përbashkët." : "Full access to shared orders and inventory."}</p>
+            <button disabled={savingProfile} className="mt-4 rounded-md bg-[#9e0102] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{savingProfile ? t.checking : t.save}</button>
+            {profileMessage && <p role="status" className="mt-3 text-sm">{profileMessage}</p>}
+          </form>
+        </details>
         <section className="mb-8 rounded-xl border border-[#dfd4ca] bg-white p-5 shadow-sm">
           <h2 className="font-serif text-2xl">{t.inventory}</h2>
           <p className="mt-1 text-sm text-[#62584f]">{t.inventoryHelp}</p>
@@ -290,7 +321,12 @@ const AdminOrders = () => {
             {products.filter((product) => product.category === "capsules").map((product) => (
               <article key={product.code} className="rounded-lg border border-[#e3d9d0] p-4">
                 <p className="font-semibold">{product.name}</p>
-                <p className="text-xs text-[#62584f]">{product.code}</p>
+                <p className="mt-1 text-sm text-[#62584f]">{language === "sq" ? "1 paketë" : "1 pack"} = {product.code.includes("50") ? 50 : 10} {language === "sq" ? "kapsula" : "capsules"}</p>
+                <label className="mt-3 block text-xs font-semibold" htmlFor={`stock-mode-${product.code}`}>{language === "sq" ? "Menaxhimi i stokut" : "Stock management"}</label>
+                <select id={`stock-mode-${product.code}`} value={stockDrafts[product.code]?.trim() ? "counted" : "unlimited"} onChange={(event) => setStockDrafts((current) => ({ ...current, [product.code]: event.target.value === "counted" ? "0" : "" }))} className="mt-1 w-full rounded-md border border-[#d6c8bb] bg-white px-3 py-2 text-sm">
+                  <option value="unlimited">{t.untracked}</option>
+                  <option value="counted">{language === "sq" ? "Përcaktoni numrin e paketave" : "Set number of packs"}</option>
+                </select>
                 <label className="mt-3 block text-xs font-bold uppercase tracking-[0.08em]" htmlFor={`stock-${product.code}`}>{t.quantity}</label>
                 <input
                   id={`stock-${product.code}`}
@@ -298,10 +334,12 @@ const AdminOrders = () => {
                   min="0"
                   step="1"
                   value={stockDrafts[product.code] || ""}
+                  disabled={!stockDrafts[product.code]?.trim()}
                   placeholder={t.untracked}
                   onChange={(event) => setStockDrafts((current) => ({ ...current, [product.code]: event.target.value }))}
                   className="mt-1 w-full rounded-md border border-[#d6c8bb] px-3 py-2"
                 />
+                {stockDrafts[product.code]?.trim() && <p className="mt-2 text-xs text-[#62584f]">{stockDrafts[product.code]} {language === "sq" ? "paketa" : "packs"} × {product.code.includes("50") ? 50 : 10} = {Number(stockDrafts[product.code]) * (product.code.includes("50") ? 50 : 10)} {language === "sq" ? "kapsula gjithsej" : "capsules in total"}</p>}
                 <div className="mt-3 flex gap-2">
                   <button
                     type="button"

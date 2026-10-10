@@ -123,6 +123,7 @@ enum FulfillmentStatus {
 
 model AdminUser {
   id String @id @default(cuid())
+  name String @default("")
   email String @unique
   active Boolean @default(true)
   codeHash String?

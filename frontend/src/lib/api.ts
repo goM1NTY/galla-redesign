@@ -167,3 +167,11 @@ export function verifyAdminCode(email: string, code: string) {
 export function logoutAdmin(token: string) {
   return request<never>("/admin/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
 }
+
+export interface AdminProfile { name: string; email: string; role: string; }
+export function getAdminProfile(token: string) {
+  return request<AdminProfile>("/admin/profile", { headers: { Authorization: `Bearer ${token}` } });
+}
+export function saveAdminProfile(token: string, name: string) {
+  return request<AdminProfile>("/admin/profile", { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ name }) });
+}

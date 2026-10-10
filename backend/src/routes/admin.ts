@@ -59,3 +59,26 @@ adminRouter.post("/logout", async (req, res) => {
   res.json({ success: true });
  } catch { res.status(503).json({ success: false, error: "Sign-out is temporarily unavailable." }); }
 });
+
+async function profileUser(token: string | undefined) {
+  if (!token) return null;
+  const session = await prisma.adminSession.findUnique({ where: { tokenHash: hashAdminToken(token) }, include: { user: true } });
+  return session && session.expiresAt > new Date() && session.user.active ? session.user : null;
+}
+adminRouter.get("/profile", async (req, res) => {
+ try {
+  const user = await profileUser(req.header("authorization")?.replace(/^Bearer /, ""));
+  if (!user) return res.status(401).json({ success: false, error: "Please sign in." });
+  return res.json({ success: true, data: { name: user.name, email: user.email, role: "Admin" } });
+ } catch { return res.status(503).json({ success: false, error: "Could not load profile." }); }
+});
+adminRouter.patch("/profile", async (req, res) => {
+ try {
+  const user = await profileUser(req.header("authorization")?.replace(/^Bearer /, ""));
+  if (!user) return res.status(401).json({ success: false, error: "Please sign in." });
+  const parsed = z.object({ name: z.string().trim().min(2).max(80) }).safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ success: false, error: "Name must be between 2 and 80 characters." });
+  const updated = await prisma.adminUser.update({ where: { id: user.id }, data: { name: parsed.data.name } });
+  return res.json({ success: true, data: { name: updated.name, email: updated.email, role: "Admin" } });
+ } catch { return res.status(503).json({ success: false, error: "Could not save profile." }); }
+});
