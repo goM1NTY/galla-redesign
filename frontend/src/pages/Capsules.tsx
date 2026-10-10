@@ -12,6 +12,8 @@ import creamCoffee from "@/assets/cream-coffee.webp";
 import blackCoffee from "@/assets/black-coffee.webp";
 import { getProducts, placeCapsuleOrder, sendEspressoInquiry } from "@/lib/api";
 
+import { normalizeMacedonianPhone } from "@/lib/phone";
+
 type Language = "en" | "sq" | "mk";
 const LANGUAGE_STORAGE_KEY = "galla_lang";
 
@@ -152,9 +154,11 @@ const capsuleTranslations = {
     submitting: "Submitting...",
     placeOrder: "Place Order",
     orderSuccess: "Order placed successfully. Payment is due in cash on delivery.",
-    confirmationTitle: "Order Confirmed",
+    confirmationTitle: "Thank you for your order",
+    continueShopping: "Continue shopping",
+    emailUnavailable: "Your order has been received. We could not send the confirmation email. Please keep your order number for reference.",
     orderNumber: "Order number",
-    confirmationEmail: "A confirmation email was sent to",
+    confirmationEmail: "Your order details have been emailed to",
     acceptPolicies: "I have read and agree to:",
     orderFailed: "Could not submit your order.",
     freeShippingNote: "Delivery across North Macedonia in 3–5 business days. Delivery is 120 MKD and free above 2,150 MKD.",
@@ -221,7 +225,9 @@ const capsuleTranslations = {
     submitting: "Duke dërguar...",
     placeOrder: "Bëni porosinë",
     orderSuccess: "Porosia u krye me sukses. Pagesa bëhet me para në dorë gjatë dorëzimit.",
-    confirmationTitle: "Porosia u konfirmua",
+    confirmationTitle: "Faleminderit për porosinë tuaj",
+    continueShopping: "Vazhdoni blerjet",
+    emailUnavailable: "Porosia juaj u pranua. Emaili i konfirmimit nuk mund të dërgohej. Ju lutemi ruani numrin e porosisë.",
     orderNumber: "Numri i porosisë",
     confirmationEmail: "Një email konfirmimi u dërgua te",
     acceptPolicies: "I kam lexuar dhe i pranoj:",
@@ -290,7 +296,9 @@ const capsuleTranslations = {
     submitting: "Се испраќа...",
     placeOrder: "Нарачајте",
     orderSuccess: "Нарачката е успешно направена. Плаќањето е во готово при достава.",
-    confirmationTitle: "Нарачката е потврдена",
+    confirmationTitle: "Ви благодариме за нарачката",
+    continueShopping: "Продолжете со купување",
+    emailUnavailable: "Вашата нарачка е примена. Е-поштата за потврда не можеше да се испрати. Зачувајте го бројот на нарачката.",
     orderNumber: "Број на нарачка",
     confirmationEmail: "Е-пошта за потврда е испратена до",
     acceptPolicies: "Ги прочитав и ги прифаќам:",
@@ -368,6 +376,7 @@ const Capsules = () => {
   const [orderSubmitMessage, setOrderSubmitMessage] = useState("");
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<{
+    confirmationEmailSent: boolean;
     orderNumber: string;
     customerEmail: string;
     totalCents: number;
@@ -408,6 +417,10 @@ const Capsules = () => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
   }, [lang]);
 
+  useEffect(() => {
+    if (confirmedOrder) document.getElementById("order-confirmation")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [confirmedOrder]);
+
   const increaseCapsule = (id: string) => {
     const availability = productAvailability[id];
     if (!availability?.inStock) return;
@@ -427,7 +440,7 @@ const Capsules = () => {
   };
 
   const handleCapsuleOrderSubmit = async () => {
-    if (!hasCapsuleSelection) return;
+    if (!hasCapsuleSelection || !normalizeMacedonianPhone(orderForm.customerPhone)) return;
 
     setOrderSubmitState("loading");
     setOrderSubmitMessage("");
@@ -435,7 +448,7 @@ const Capsules = () => {
       const result = await placeCapsuleOrder({
         customerName: orderForm.customerName,
         customerEmail: orderForm.customerEmail,
-        customerPhone: orderForm.customerPhone,
+        customerPhone: normalizeMacedonianPhone(orderForm.customerPhone)!,
         deliveryAddress: orderForm.deliveryAddress,
         city: orderForm.city,
         postalCode: orderForm.postalCode || undefined,
@@ -453,7 +466,7 @@ const Capsules = () => {
 
       setOrderSubmitState("success");
       setOrderSubmitMessage(t.orderSuccess);
-      setConfirmedOrder(result.data);
+      setConfirmedOrder({ ...result.data, confirmationEmailSent: result.confirmationEmailSent === true });
       setCapsuleQty({ ...INITIAL_CAPSULE_QTY });
       setOrderForm({
         customerName: "",
@@ -529,6 +542,7 @@ const Capsules = () => {
 
         {confirmedOrder && (
           <section
+            id="order-confirmation"
             aria-live="polite"
             className="mx-auto mt-10 max-w-2xl rounded-[12px] border border-green-300 bg-green-50 px-5 py-6 text-center shadow-sm"
           >
@@ -541,8 +555,20 @@ const Capsules = () => {
               {t.total}: {dualPrice(confirmedOrder.totalCents / 100, confirmedOrder.eurToMkdRate)}
             </p>
             <p className="mt-1 text-xs text-[#536057]">
-              {t.confirmationEmail} {confirmedOrder.customerEmail}.
+              {confirmedOrder.confirmationEmailSent ? `${t.confirmationEmail} ${confirmedOrder.customerEmail}.` : t.emailUnavailable}
             </p>
+            <button
+              type="button"
+              className="mt-5 rounded-md bg-[#9e0102] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+              onClick={() => {
+                setConfirmedOrder(null);
+                setOrderSubmitState("idle");
+                setOrderSubmitMessage("");
+                document.getElementById("capsule-collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              {t.continueShopping}
+            </button>
           </section>
         )}
 
@@ -669,12 +695,20 @@ const Capsules = () => {
               <input
                 type="tel"
                 value={orderForm.customerPhone}
-                onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                onChange={(event) => setOrderForm((prev) => ({ ...prev, customerPhone: event.target.value.replace(/[^\d+\s()-]/g, "") }))}
                 aria-label={t.phone}
-                placeholder={t.phone}
+                placeholder="+389 71 234 567"
+                inputMode="tel"
+                maxLength={24}
+                aria-invalid={Boolean(orderForm.customerPhone && !normalizeMacedonianPhone(orderForm.customerPhone))}
                 required
                 className="w-full rounded-[6px] border border-[#E0E0E0] px-3 py-3 text-sm outline-none focus:border-[#9e0102]"
               />
+              <p className="text-xs text-[#71665c] md:col-span-2" role="status">
+                {lang === "sq" ? "Përdorni një numër të Maqedonisë së Veriut: +389 ose prefiksin lokal 0. Dërgesat kryhen vetëm brenda Maqedonisë së Veriut."
+                  : lang === "mk" ? "Користете број од Северна Македонија: +389 или локален префикс 0. Доставата е само во Северна Македонија."
+                  : "Use a North Macedonian number: +389 or the local 0 prefix. Delivery is within North Macedonia only."}
+              </p>
               <input
                 type="text"
                 value={orderForm.deliveryAddress}
@@ -779,7 +813,7 @@ const Capsules = () => {
                 orderSubmitState === "loading" ||
                 !orderForm.customerName.trim() ||
                 !orderForm.customerEmail.trim() ||
-                !orderForm.customerPhone.trim() ||
+                !normalizeMacedonianPhone(orderForm.customerPhone) ||
                 !orderForm.deliveryAddress.trim() ||
                 !orderForm.city.trim() ||
                 !acceptedPolicies ||

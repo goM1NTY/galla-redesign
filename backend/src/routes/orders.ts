@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { randomBytes } from "node:crypto";
+import { normalizeMacedonianPhone } from "../lib/phone.js";
 import { FulfillmentStatus, PaymentMethod, PaymentStatus, ProductCategory } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
@@ -13,7 +13,7 @@ import {
 const capsuleOrderSchema = z.object({
   customerName: z.string().trim().min(2),
   customerEmail: z.string().trim().email(),
-  customerPhone: z.string().trim().min(6).max(40),
+  customerPhone: z.string().trim().max(40).refine((value) => normalizeMacedonianPhone(value) !== null, "Enter a valid North Macedonian phone number (+389 or local 0 prefix)").transform((value) => normalizeMacedonianPhone(value)!),
   deliveryAddress: z.string().trim().min(5).max(200),
   city: z.string().trim().min(2).max(100),
   postalCode: z.string().trim().max(20).optional(),
@@ -189,9 +189,8 @@ ordersRouter.post("/capsules", async (req, res) => {
   const subtotalCents = pricedItems.reduce((sum, item) => sum + item.lineTotalCents, 0);
   const shippingCents = subtotalCents >= FREE_SHIPPING_MKD_CENTS ? 0 : SHIPPING_MKD_CENTS;
   const totalCents = subtotalCents + shippingCents;
-  const orderNumber = `GALLA-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${randomBytes(3)
-    .toString("hex")
-    .toUpperCase()}`;
+  const [sequence] = await prisma.$queryRaw<{ number: bigint }[]>`SELECT nextval('order_number_seq') AS number`;
+  const orderNumber = `GALLA-${sequence.number}`;
 
   const order = await prisma.order.create({
     data: {

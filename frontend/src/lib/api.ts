@@ -5,6 +5,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   emailSent?: boolean;
+  confirmationEmailSent?: boolean;
 }
 
 interface CapsuleOrderResponse {

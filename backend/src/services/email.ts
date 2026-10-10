@@ -13,13 +13,14 @@ async function sendEmail(to: string, subject: string, text: string) {
     return { sent: false, reason: "missing_api_key" as const };
   }
 
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: MAIL_FROM,
     to: [to],
     subject,
     text,
   });
 
+  if (result.error) throw new Error(`Email could not be sent: ${result.error.message}`);
   return { sent: true as const };
 }
 
