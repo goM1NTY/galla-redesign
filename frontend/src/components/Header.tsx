@@ -1,3 +1,4 @@
+import LogoBackgroundFilter from "./LogoBackgroundFilter";
 import gallaLogo from "@/assets/galla-logo.webp";
 
 type Language = "en" | "sq" | "mk";
@@ -31,6 +32,7 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
 
   return (
     <header className="relative bg-[#9e0102] text-white">
+      <LogoBackgroundFilter />
       <div className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-1.5 pt-3.5 md:pt-4">
         <div className="absolute right-4 top-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em] md:right-6 md:text-xs">
           <button
@@ -59,7 +61,7 @@ const Header = ({ lang, onLangChange }: HeaderProps) => {
           <img
             src={gallaLogo}
             alt="Galla Espresso Italiano"
-            style={{ filter: "url(/logo-background.svg#match-header)" }}
+            style={{ filter: "url(#match-header)" }}
             className="mx-auto h-auto w-full max-w-[265px] md:max-w-[325px]"
           />
         </div>

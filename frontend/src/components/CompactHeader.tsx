@@ -1,3 +1,4 @@
+import LogoBackgroundFilter from "./LogoBackgroundFilter";
 import { Link } from "react-router-dom";
 import gallaLogo from "@/assets/galla-logo.webp";
 
@@ -39,7 +40,8 @@ const CompactHeader = ({ cartCount = 0, cartHref, lang = "en", onLangChange }: C
     <header className="sticky top-0 z-40 border-b border-[#c14546] bg-[#9e0102] text-white">
       <div className="flex items-center justify-between gap-4 py-1.5 pl-5 pr-4">
         <Link to="/" className="relative inline-flex h-14 w-24 shrink-0 items-center justify-center overflow-hidden md:h-16 md:w-28">
-          <img src={gallaLogo} alt="Galla Espresso Italiano" style={{ filter: "url(/logo-background.svg#match-header)" }} className="absolute h-24 w-auto max-w-none object-contain md:h-28" />
+          <LogoBackgroundFilter />
+          <img src={gallaLogo} alt="Galla Espresso Italiano" style={{ filter: "url(#match-header)" }} className="absolute h-24 w-auto max-w-none object-contain md:h-28" />
         </Link>
 
         <div className="flex flex-col items-end gap-1">
